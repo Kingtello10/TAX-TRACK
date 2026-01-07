@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TaxTrack NG | Nigeria Tax Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- UI System CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== Additional Home Page Styling ===== */
+
+    body { background: var(--bg); }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar .logo {
+      font-weight: 700;
+      font-size: 24px;
+      color: var(--primary);
+    }
+
+    .menu {
+      position: relative;
+    }
+
+    .menu .menu-btn {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-dark);
+    }
+
+    .menu .dropdown {
+      position: absolute;
+      right: 0;
+      top: 50px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      min-width: 160px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .menu .dropdown.show { display: flex; }
+
+    .menu .dropdown a {
+      padding: 12px 18px;
+      text-decoration: none;
+      color: var(--text-dark);
+      transition: background 0.2s;
+    }
+
+    .menu .dropdown a:hover { background: var(--bg); }
+
+    /* Hero */
+    .hero {
+      max-width: 900px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .hero h1 {
+      font-size: 38px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+
+    .hero p {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+
+    .primary-btn {
+      background: var(--accent);
+      color: white;
+      padding: 14px 28px;
+      font-weight: 500;
+      border-radius: 12px;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    #questions {
+      margin-top: 20px;
+      font-weight: 500;
+      font-size: 18px;
+      color: var(--primary);
+      min-height: 28px;
+    }
+
+    /* Features Section */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+
+    .features .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 28px 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .features .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    .features .card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .features .card p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 36px 20px;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      margin-top: 80px;
+    }
+
+    .footer .socials a {
+      color: var(--text-dark);
+      margin: 0 10px;
+      font-size: 20px;
+      transition: color 0.2s;
+    }
+
+    .footer .socials a:hover {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">TaxTrack NG</div>
+    <div class="menu">
+      <button class="menu-btn" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="dropdown" id="dropdown">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="profile.html">Profile</a>
+        <a href="#">About Us</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Understand Your Taxes Clearly</h1>
+    <p>Track VAT, income tax, and daily consumption taxes in Nigeria.</p>
+
+    <a href="login.html" class="primary-btn">Get Started</a>
+
+    <div class="questions" id="questions">
+      How much VAT do you pay daily?
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="card">
+      <h3>VAT Tracking</h3>
+      <p>Automatically calculate 7.5% VAT from your everyday expenses.</p>
+    </div>
+    <div class="card">
+      <h3>Income Tax Insights</h3>
+      <p>Estimate PAYE and personal income tax with clarity.</p>
+    </div>
+    <div class="card">
+      <h3>Smart Reports</h3>
+      <p>Monthly and yearly summaries designed for simplicity.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 TaxTrack NG. All rights reserved.</p>
+    <div class="socials">
+      <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+    </div>
+  </footer>
+
+  <!-- JS -->
+ <script>
+  // ===== Dynamic Questions =====
+  const questions = [
+    "How much VAT do you pay daily?",
+    "Do you know your PAYE deductions?",
+    "Are you tracking hidden consumption taxes?",
+    "Do you know how much tax you pay monthly?",
+    "Are you paying more VAT than you think?"
+  ];
+
+  let index = 0, charIndex = 0;
+  const q = document.getElementById("questions");
+
+  function typeQuestion() {
+    if (charIndex < questions[index].length) {
+      q.textContent += questions[index][charIndex];
+      charIndex++;
+      setTimeout(typeQuestion, 50);
+    } else {
+      setTimeout(() => eraseQuestion(), 2000);
+    }
+  }
+
+  function eraseQuestion() {
+    if (charIndex > 0) {
+      q.textContent = questions[index].substring(0, charIndex - 1);
+      charIndex--;
+      setTimeout(eraseQuestion, 30);
+    } else {
+      index = (index + 1) % questions.length;
+      setTimeout(typeQuestion, 500);
+    }
+  }
+
+  typeQuestion();
+
+  // ===== Dropdown Menu Toggle =====
+  const dropdown = document.getElementById("dropdown");
+  const menuBtn = document.querySelector(".menu-btn");
+
+  function toggleMenu() {
+    dropdown.classList.toggle("show");
+  }
+
+  window.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+      dropdown.classList.remove("show");
+    }
+  });
+
+  dropdown.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => dropdown.classList.remove("show"));
+  });
+
+  // ===== User Authentication & Admin Access =====
+  function isUserLoggedIn() {
+    return localStorage.getItem("userLoggedIn") === "true";
+  }
+
+  function isAdmin() {
+    return localStorage.getItem("userRole") === "admin";
+  }
+
+  const protectedPages = ["profile.html", "dashboard.html"];
+  const currentPage = window.location.pathname.split("/").pop();
+
+  // ===== Hidden Admin Access via URL =====
+  const urlParams = new URLSearchParams(window.location.search);
+  const adminKeyParam = urlParams.get('adminkey');
+  const ADMIN_KEY = "TAXTRACK2026"; // <-- your secret key
+
+  if (adminKeyParam === ADMIN_KEY) {
+    localStorage.setItem("userLoggedIn", "true");
+    localStorage.setItem("userRole", "admin");
+  }
+
+  // Redirect normal users if accessing protected pages
+  if (protectedPages.includes(currentPage) && !isUserLoggedIn() && !isAdmin()) {
+    window.location.href = "login.html";
+  }
+
+  // Redirect normal users clicking protected links
+  dropdown.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", (e) => {
+      const href = link.getAttribute("href");
+      if (protectedPages.includes(href) && !isUserLoggedIn() && !isAdmin()) {
+        e.preventDefault();
+        window.location.href = "login.html";
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

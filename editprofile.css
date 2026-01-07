@@ -1,0 +1,166 @@
+/* ====== GLOBAL STYLES ====== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f4f6f8;
+  color: #333;
+}
+
+/* ====== SIDEBAR ====== */
+.sidebar {
+  width: 220px;
+  background-color: #1e293b;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar .logo a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  display: inline-block;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar nav ul li {
+  margin-bottom: 15px;
+}
+
+.sidebar nav ul li a {
+  text-decoration: none;
+  color: #cbd5e1;
+  padding: 10px 12px;
+  display: block;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.sidebar nav ul li a:hover,
+.sidebar nav ul li.active a {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+/* ====== MAIN CONTENT ====== */
+.content {
+  flex: 1;
+  padding: 40px;
+}
+
+.content h1 {
+  margin-bottom: 30px;
+  color: #1e293b;
+}
+
+/* ====== FORM STYLES ====== */
+.edit-profile-form {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.edit-profile-form fieldset {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.edit-profile-form legend {
+  font-weight: bold;
+  padding: 0 10px;
+  color: #1e293b;
+}
+
+.edit-profile-form label {
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+.edit-profile-form input,
+.edit-profile-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.edit-profile-form input:focus,
+.edit-profile-form select:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* ====== BUTTON ====== */
+.edit-profile-form button {
+  background-color: #3b82f6;
+  color: #fff;
+  font-weight: bold;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.edit-profile-form button:hover {
+  background-color: #2563eb;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 15px 10px;
+  }
+
+  .sidebar nav ul {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .edit-profile-form {
+    padding: 20px;
+  }
+
+  .edit-profile-form input,
+  .edit-profile-form select {
+    font-size: 0.95rem;
+  }
+}

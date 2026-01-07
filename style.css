@@ -1,0 +1,189 @@
+/* ===== TAXTRACK NG HOME PAGE CSS ===== */
+
+/* ===== VARIABLES ===== */
+:root {
+  --primary: #0f2a44;   /* Dark blue for trust */
+  --accent: #1ea672;    /* Green accent for buttons/status */
+  --bg: #f6f8fb;        /* Page background */
+  --card: #ffffff;      /* Cards & sections */
+  --text-dark: #1f2937; /* Main text */
+  --text-muted: #6b7280; /* Secondary text */
+  --border: #e5e7eb;    /* Borders */
+  --danger: #e5533d;    /* Red status */
+}
+
+/* ===== GLOBAL ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar .logo {
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--primary);
+}
+
+.menu {
+  position: relative;
+}
+
+.menu .menu-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+.menu .dropdown {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: none;
+  flex-direction: column;
+  min-width: 160px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.menu .dropdown.show { display: flex; }
+
+.menu .dropdown a {
+  padding: 12px 18px;
+  text-decoration: none;
+  color: var(--text-dark);
+  transition: background 0.2s;
+}
+
+.menu .dropdown a:hover { background: var(--bg); }
+
+/* ===== HERO SECTION ===== */
+.hero {
+  max-width: 900px;
+  margin: 80px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero h1 {
+  font-size: 38px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--primary);
+}
+
+.hero p {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin-bottom: 30px;
+}
+
+.primary-btn {
+  background: var(--accent);
+  color: white;
+  padding: 14px 28px;
+  font-weight: 500;
+  border-radius: 12px;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+#questions {
+  margin-top: 20px;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--primary);
+  min-height: 28px;
+}
+
+/* ===== FEATURES SECTION ===== */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+.features .card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 28px 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.features .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.features .card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.features .card p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 36px 20px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  margin-top: 80px;
+}
+
+.footer .socials a {
+  color: var(--text-dark);
+  margin: 0 10px;
+  font-size: 20px;
+  transition: color 0.2s;
+}
+
+.footer .socials a:hover {
+  color: var(--accent);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .navbar { padding: 12px 20px; }
+  .hero h1 { font-size: 28px; }
+  .primary-btn { padding: 12px 24px; }
+  .features { gap: 16px; }
+}

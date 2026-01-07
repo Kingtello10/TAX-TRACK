@@ -1,0 +1,159 @@
+/* ===== TAXTRACK NG SIGN-UP PAGE CSS ===== */
+
+/* Root variables (matching landing & login) */
+:root {
+  --primary: #0f2a44;   /* Dark blue for trust */
+  --accent: #1ea672;    /* Green accent for buttons/status */
+  --bg: #f6f8fb;        /* Page background */
+  --card: #ffffff;      /* Cards & sections */
+  --text-dark: #1f2937; /* Main text */
+  --text-muted: #6b7280; /* Secondary text */
+  --border: #e5e7eb;    /* Borders */
+  --danger: #e5533d;    /* Red status */
+}
+
+/* ===== GLOBAL STYLING ===== */
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: linear-gradient(135deg, #f6f8fb 0%, #e0e6f0 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text-dark);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+}
+
+.auth-card {
+  background: var(--card);
+  padding: 48px 36px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.auth-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Titles */
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+/* Form styling */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.auth-form input,
+.auth-form select {
+  margin-top: 6px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(30, 166, 114, 0.2);
+}
+
+/* Buttons */
+.primary-btn {
+  background: var(--accent);
+  color: white;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(30, 166, 114, 0.3);
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Footer text */
+.auth-footer {
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.auth-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.auth-footer a:hover {
+  color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 36px 24px;
+  }
+  .auth-title { font-size: 24px; }
+  .auth-subtitle { font-size: 13px; }
+}
+
+.back-home {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.back-home a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.back-home a:hover {
+  color: var(--accent);
+}

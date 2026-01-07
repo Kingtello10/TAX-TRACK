@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Profile | TaxTrack NG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Professional 2026 fintech-style user profile for TaxTrack NG.">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ===== Base ===== */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
+    body { background: #f4f6fa; color: #111827; line-height: 1.6; }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ===== Header ===== */
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top:0;
+      z-index:100;
+    }
+    header .logo { font-size: 1.5rem; font-weight: 700; }
+    header .dropdown {
+      position: relative;
+    }
+    header .dropdown button {
+      background: #2563eb;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap:0.5rem;
+    }
+    header .dropdown button:hover { background:#1d4ed8; }
+    header .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 2.8rem;
+      background: #fff;
+      min-width: 200px;
+      border-radius: 0.75rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      overflow: hidden;
+      z-index: 100;
+    }
+    header .dropdown-content a {
+      display: block;
+      padding: 0.8rem 1rem;
+      color: #111827;
+      transition: 0.2s;
+    }
+    header .dropdown-content a:hover { background:#f1f5f9; }
+    header .dropdown.show .dropdown-content { display: block; }
+
+    /* ===== Main Container ===== */
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* ===== Profile Header ===== */
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    }
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #2563eb;
+      margin-bottom: 1rem;
+    }
+    .profile-header h2 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .profile-header p { color: #6b7280; margin-bottom: 0.5rem; }
+    .edit-btn {
+      background: #2563eb;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 0.75rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 1rem;
+    }
+    .edit-btn:hover { background: #1d4ed8; }
+
+    /* ===== Profile Sections ===== */
+    .profile-section {
+      margin-top: 2rem;
+      background: #fff;
+      border-radius: 1rem;
+      padding: 1.8rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    }
+    .profile-section h3 { font-size: 1.2rem; margin-bottom: 1rem; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; }
+    .profile-section p { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.95rem; }
+    .profile-section p span { font-weight: 500; }
+    .editable { cursor: pointer; padding:2px 4px; border-radius:4px; transition:0.2s; }
+    .editable:hover { background:#e5e7eb; }
+    .toggle-password { background:none; border:none; color:#2563eb; cursor:pointer; font-size:0.85rem; margin-left:0.5rem; }
+
+    /* ===== Responsive ===== */
+    @media(max-width:600px) {
+      .profile-header, .profile-section { padding: 1.5rem; }
+      .profile-header h2 { font-size:1.5rem; }
+      .avatar { width: 100px; height: 100px; }
+      header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      header .dropdown { width:100%; }
+      header .dropdown button { width:100%; justify-content:space-between; }
+      header .dropdown-content { right:0; left:0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TaxTrack NG</div>
+  <div class="dropdown" id="userDropdown">
+    <button onclick="toggleDropdown()"><i class="fa-solid fa-user"></i> Account <i class="fa-solid fa-caret-down"></i></button>
+    <div class="dropdown-content">
+      <a href="#personal">Personal Info</a>
+      <a href="#employment">Employment & Tax</a>
+      <a href="#security">Security Settings</a>
+      <a href="#download">Download Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Profile Header -->
+  <section class="profile-header">
+    <img src="" alt="User Avatar" class="avatar" id="avatar">
+    <h2 id="name">Loading...</h2>
+    <p>Email: <span id="email"></span></p>
+    <p>Employment: <span id="employment"></span></p>
+    <button class="edit-btn" onclick="editProfile()"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+  </section>
+
+  <!-- Personal Info -->
+  <section class="profile-section" id="personal">
+    <h3>Personal Information</h3>
+    <p>Full Name: <span class="editable" id="fullName"></span></p>
+    <p>Phone: <span class="editable" id="phone"></span></p>
+    <p>Date of Birth: <span class="editable" id="dob"></span></p>
+  </section>
+
+  <!-- Employment & Tax Info -->
+  <section class="profile-section" id="employment">
+    <h3>Employment & Tax Information</h3>
+    <p>Employment Type: <span class="editable" id="employmentType"></span></p>
+    <p>Company: <span class="editable" id="company"></span></p>
+    <p>Tax ID: <span class="editable" id="taxId"></span></p>
+  </section>
+
+  <!-- Security Settings -->
+  <section class="profile-section" id="security">
+    <h3>Security Settings</h3>
+    <p>Password: <span id="password">••••••••</span>
+      <button class="toggle-password" onclick="togglePassword()">Show</button>
+    </p>
+  </section>
+</main>
+
+<script>
+  // ===== Profile Data =====
+  const profileData = {
+    avatar: 'avatar.png',
+    name: 'John Doe',
+    email: 'john.doe@email.com',
+    employment: 'Salary Earner',
+    fullName: 'John Doe',
+    phone: '+234 800 000 0000',
+    dob: '12 Dec 1990',
+    employmentType: 'Salary Earner',
+    company: 'ACME Ltd',
+    taxId: '123-45-6789',
+    password: 'password123'
+  };
+
+  function loadProfile() {
+    document.getElementById('avatar').src = profileData.avatar;
+    document.getElementById('name').textContent = profileData.name;
+    document.getElementById('email').textContent = profileData.email;
+    document.getElementById('employment').textContent = profileData.employment;
+    document.getElementById('fullName').textContent = profileData.fullName;
+    document.getElementById('phone').textContent = profileData.phone;
+    document.getElementById('dob').textContent = profileData.dob;
+    document.getElementById('employmentType').textContent = profileData.employmentType;
+    document.getElementById('company').textContent = profileData.company;
+    document.getElementById('taxId').textContent = profileData.taxId;
+    document.getElementById('password').dataset.password = profileData.password;
+  }
+
+  // ===== Inline Editing =====
+  function enableInlineEdit() {
+    document.querySelectorAll('.editable').forEach(el => {
+      el.addEventListener('click', () => {
+        const current = el.textContent;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = current;
+        input.style.width = '100%';
+        el.replaceWith(input);
+        input.focus();
+        input.addEventListener('blur', () => {
+          el.textContent = input.value || current;
+          input.replaceWith(el);
+        });
+      });
+    });
+  }
+
+  // ===== Edit Profile Button =====
+  function editProfile() {
+    alert('This would open an edit profile modal or navigate to edit page.');
+  }
+
+  // ===== Toggle Password =====
+  function togglePassword() {
+    const pwdEl = document.getElementById('password');
+    const btn = pwdEl.nextElementSibling;
+    if(btn.textContent === 'Show'){
+      pwdEl.textContent = pwdEl.dataset.password;
+      btn.textContent = 'Hide';
+    } else {
+      pwdEl.textContent = '••••••••';
+      btn.textContent = 'Show';
+    }
+  }
+
+  // ===== Dropdown Menu =====
+  function toggleDropdown() {
+    document.getElementById('userDropdown').classList.toggle('show');
+  }
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropdown button')) {
+      const dropdowns = document.getElementsByClassName("dropdown");
+      Array.from(dropdowns).forEach(dd => dd.classList.remove('show'));
+    }
+  }
+
+  // ===== Logout Function =====
+  function logout() {
+    alert('Logging out...');
+    // Simulate logout redirect
+    window.location.href = 'login.html';
+  }
+
+  // ===== Initialize =====
+  loadProfile();
+  enableInlineEdit();
+</script>
+ <div style="text-align:center; margin:3rem 0;">
+    <a href="dashboard.html" class="edit-btn" style="background:#10b981;">
+      <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+</body>
+</html>
