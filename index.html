@@ -5,20 +5,16 @@
   <title>TaxTrack NG | Nigeria Tax Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Font & Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- UI System CSS -->
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* ===== Additional Home Page Styling ===== */
+
 
     body { background: var(--bg); }
 
-    /* Navbar */
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -73,7 +69,6 @@
 
     .menu .dropdown a:hover { background: var(--bg); }
 
-    /* Hero */
     .hero {
       max-width: 900px;
       margin: 80px auto;
@@ -118,7 +113,6 @@
       min-height: 28px;
     }
 
-    /* Features Section */
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -152,7 +146,6 @@
       color: var(--text-muted);
     }
 
-    /* Footer */
     .footer {
       text-align: center;
       padding: 36px 20px;
@@ -175,7 +168,6 @@
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <nav class="navbar">
     <div class="logo">TaxTrack NG</div>
     <div class="menu">
@@ -191,7 +183,6 @@
     </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
     <h1>Understand Your Taxes Clearly</h1>
     <p>Track VAT, income tax, and daily consumption taxes in Nigeria.</p>
@@ -203,7 +194,6 @@
     </div>
   </section>
 
-  <!-- FEATURES -->
   <section class="features">
     <div class="card">
       <h3>VAT Tracking</h3>
@@ -219,7 +209,6 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <p>© 2026 TaxTrack NG. All rights reserved.</p>
     <div class="socials">
@@ -229,9 +218,8 @@
     </div>
   </footer>
 
-  <!-- JS -->
  <script>
-  // ===== Dynamic Questions =====
+   
   const questions = [
     "How much VAT do you pay daily?",
     "Do you know your PAYE deductions?",
@@ -265,8 +253,7 @@
   }
 
   typeQuestion();
-
-  // ===== Dropdown Menu Toggle =====
+   
   const dropdown = document.getElementById("dropdown");
   const menuBtn = document.querySelector(".menu-btn");
 
@@ -284,7 +271,6 @@
     link.addEventListener("click", () => dropdown.classList.remove("show"));
   });
 
-  // ===== User Authentication & Admin Access =====
   function isUserLoggedIn() {
     return localStorage.getItem("userLoggedIn") === "true";
   }
@@ -296,7 +282,6 @@
   const protectedPages = ["profile.html", "dashboard.html"];
   const currentPage = window.location.pathname.split("/").pop();
 
-  // ===== Hidden Admin Access via URL =====
   const urlParams = new URLSearchParams(window.location.search);
   const adminKeyParam = urlParams.get('adminkey');
   const ADMIN_KEY = "TAXTRACK2026"; // <-- your secret key
@@ -306,12 +291,10 @@
     localStorage.setItem("userRole", "admin");
   }
 
-  // Redirect normal users if accessing protected pages
   if (protectedPages.includes(currentPage) && !isUserLoggedIn() && !isAdmin()) {
     window.location.href = "login.html";
   }
 
-  // Redirect normal users clicking protected links
   dropdown.querySelectorAll("a").forEach(link => {
     link.addEventListener("click", (e) => {
       const href = link.getAttribute("href");
@@ -325,3 +308,4 @@
 
 </body>
 </html>
+
