@@ -6,20 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Professional 2026 fintech-style user profile for TaxTrack NG.">
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    /* ===== Base ===== */
+
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
     body { background: #f4f6fa; color: #111827; line-height: 1.6; }
 
     a { text-decoration: none; color: inherit; }
 
-    /* ===== Header ===== */
     header {
       background: #111827;
       color: #fff;
@@ -76,7 +73,6 @@
       padding: 0 1rem;
     }
 
-    /* ===== Profile Header ===== */
     .profile-header {
       display: flex;
       flex-direction: column;
@@ -109,7 +105,6 @@
     }
     .edit-btn:hover { background: #1d4ed8; }
 
-    /* ===== Profile Sections ===== */
     .profile-section {
       margin-top: 2rem;
       background: #fff;
@@ -124,7 +119,6 @@
     .editable:hover { background:#e5e7eb; }
     .toggle-password { background:none; border:none; color:#2563eb; cursor:pointer; font-size:0.85rem; margin-left:0.5rem; }
 
-    /* ===== Responsive ===== */
     @media(max-width:600px) {
       .profile-header, .profile-section { padding: 1.5rem; }
       .profile-header h2 { font-size:1.5rem; }
@@ -153,7 +147,7 @@
 </header>
 
 <main>
-  <!-- Profile Header -->
+
   <section class="profile-header">
     <img src="" alt="User Avatar" class="avatar" id="avatar">
     <h2 id="name">Loading...</h2>
@@ -162,7 +156,6 @@
     <button class="edit-btn" onclick="editProfile()"><i class="fa-solid fa-pen"></i> Edit Profile</button>
   </section>
 
-  <!-- Personal Info -->
   <section class="profile-section" id="personal">
     <h3>Personal Information</h3>
     <p>Full Name: <span class="editable" id="fullName"></span></p>
@@ -170,7 +163,6 @@
     <p>Date of Birth: <span class="editable" id="dob"></span></p>
   </section>
 
-  <!-- Employment & Tax Info -->
   <section class="profile-section" id="employment">
     <h3>Employment & Tax Information</h3>
     <p>Employment Type: <span class="editable" id="employmentType"></span></p>
@@ -178,7 +170,6 @@
     <p>Tax ID: <span class="editable" id="taxId"></span></p>
   </section>
 
-  <!-- Security Settings -->
   <section class="profile-section" id="security">
     <h3>Security Settings</h3>
     <p>Password: <span id="password">••••••••</span>
@@ -188,7 +179,7 @@
 </main>
 
 <script>
-  // ===== Profile Data =====
+ 
   const profileData = {
     avatar: 'avatar.png',
     name: 'John Doe',
@@ -217,7 +208,7 @@
     document.getElementById('password').dataset.password = profileData.password;
   }
 
-  // ===== Inline Editing =====
+
   function enableInlineEdit() {
     document.querySelectorAll('.editable').forEach(el => {
       el.addEventListener('click', () => {
@@ -236,12 +227,10 @@
     });
   }
 
-  // ===== Edit Profile Button =====
   function editProfile() {
     alert('This would open an edit profile modal or navigate to edit page.');
   }
 
-  // ===== Toggle Password =====
   function togglePassword() {
     const pwdEl = document.getElementById('password');
     const btn = pwdEl.nextElementSibling;
@@ -254,7 +243,6 @@
     }
   }
 
-  // ===== Dropdown Menu =====
   function toggleDropdown() {
     document.getElementById('userDropdown').classList.toggle('show');
   }
@@ -265,14 +253,12 @@
     }
   }
 
-  // ===== Logout Function =====
   function logout() {
     alert('Logging out...');
-    // Simulate logout redirect
+ 
     window.location.href = 'login.html';
   }
 
-  // ===== Initialize =====
   loadProfile();
   enableInlineEdit();
 </script>
@@ -283,3 +269,4 @@
   </div>
 </body>
 </html>
+
