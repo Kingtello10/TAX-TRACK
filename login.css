@@ -1,17 +1,14 @@
-/* ===== LOGIN PAGE CSS (auth-body + auth-container) ===== */
-
 :root {
-  --primary: #0f2a44;   /* Dark blue for trust */
-  --accent: #1ea672;    /* Green accent for buttons/status */
-  --bg: #f6f8fb;        /* Page background */
-  --card: #ffffff;      /* Cards & sections */
-  --text-dark: #1f2937; /* Main text */
-  --text-muted: #6b7280; /* Secondary text */
-  --border: #e5e7eb;    /* Borders */
-  --danger: #e5533d;    /* Red status */
+  --primary: #0f2a44;   
+  --accent: #1ea672;    
+  --bg: #f6f8fb;       
+  --card: #ffffff;     
+  --text-dark: #1f2937; 
+  --text-muted: #6b7280; 
+  --border: #e5e7eb;    
+  --danger: #e5533d;    
 }
 
-/* Global */
 body.auth-body {
   font-family: 'Inter', system-ui, sans-serif;
   background: linear-gradient(135deg, #f6f8fb 0%, #e0e6f0 100%);
@@ -100,10 +97,10 @@ body.auth-body {
   color: var(--primary);
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   .auth-container {
     padding: 36px 24px;
   }
   .auth-container h2 { font-size: 22px; }
 }
+
