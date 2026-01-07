@@ -1,4 +1,3 @@
-/* ====== GLOBAL STYLES ====== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,7 +12,6 @@ body {
   color: #333;
 }
 
-/* ====== SIDEBAR ====== */
 .sidebar {
   width: 220px;
   background-color: #1e293b;
@@ -56,7 +54,6 @@ body {
   color: #fff;
 }
 
-/* ====== MAIN CONTENT ====== */
 .content {
   flex: 1;
   padding: 40px;
@@ -67,7 +64,6 @@ body {
   color: #1e293b;
 }
 
-/* ====== FORM STYLES ====== */
 .edit-profile-form {
   background-color: #fff;
   padding: 30px;
@@ -112,7 +108,6 @@ body {
   outline: none;
 }
 
-/* ====== BUTTON ====== */
 .edit-profile-form button {
   background-color: #3b82f6;
   color: #fff;
@@ -130,7 +125,6 @@ body {
   background-color: #2563eb;
 }
 
-/* ====== RESPONSIVE ====== */
 @media (max-width: 900px) {
   body {
     flex-direction: column;
@@ -164,3 +158,4 @@ body {
     font-size: 0.95rem;
   }
 }
+
