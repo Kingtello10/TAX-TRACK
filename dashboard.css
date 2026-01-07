@@ -1,18 +1,14 @@
-/* ===== TAXTRACK NG DASHBOARD CLEAN CSS ===== */
-
-/* Root Colors & Variables */
 :root {
   --primary: #1ea672; 
-  --accent: #1ea672;      /* Green Accent */
-  --bg: #f6f8fb;          /* Page Background */
-  --card: #ffffff;         /* Card & Form Background */
-  --text-dark: #1f2937;    /* Main Text */
-  --text-muted: #6b7280;   /* Secondary Text */
-  --border: #e5e7eb;       /* Borders */
-  --danger: #e5533d;       /* Alerts/Error */
+  --accent: #1ea672;      
+  --bg: #f6f8fb;         
+  --card: #ffffff;         
+  --text-dark: #1f2937;    
+  --text-muted: #6b7280;   
+  --border: #e5e7eb;       
+  --danger: #e5533d;      
 }
 
-/* ===== RESET & BASE ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -31,13 +27,11 @@ a {
   color: inherit;
 }
 
-/* ===== LAYOUT ===== */
 .layout {
   display: flex;
   min-height: 100vh;
 }
 
-/* ===== SIDEBAR ===== */
 .sidebar {
   width: 240px;
   background: var(--primary);
@@ -92,7 +86,6 @@ a {
   flex-direction: column;
 }
 
-/* ===== TOPBAR ===== */
 .topbar {
   background: var(--card);
   border-bottom: 1px solid var(--border);
@@ -121,7 +114,6 @@ a {
   color: var(--accent);
 }
 
-/* ===== PAGE SECTION ===== */
 .page {
   flex: 1;
   padding: 32px;
@@ -144,7 +136,6 @@ a {
   color: var(--text-muted);
 }
 
-/* ===== FORMS ===== */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -203,7 +194,6 @@ textarea {
   grid-column: 1 / -1;
 }
 
-/* ===== DASHBOARD CARDS ===== */
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -236,7 +226,6 @@ textarea {
   color: var(--accent);
 }
 
-/* ===== TABLES ===== */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -262,7 +251,6 @@ tr:hover {
   background: #f1f5f9;
 }
 
-/* ===== FOOTER ===== */
 footer {
   background: var(--primary);
   color: #e5e7eb;
@@ -287,7 +275,6 @@ footer a:hover {
   color: var(--accent);
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
   .sidebar {
     width: 200px;
@@ -312,3 +299,4 @@ footer a:hover {
   .topbar h1 { font-size: 1.3rem; }
   .page { padding: 20px; }
 }
+
