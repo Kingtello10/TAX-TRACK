@@ -1,14 +1,8 @@
-// ============================
-// TAXTRACK NG DASHBOARD JS (SMART OCR + EDITABLE)
-// ============================
-
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ===== GLOBAL DATA =====
   let taxData = { paye: 0, vat: 0, consumption: 0, transactions: [] };
   let chart;
 
-  // ===== PAGE NAVIGATION =====
   function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
@@ -18,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ===== PAYE CALCULATOR =====
   function calculatePAYE() {
     const gross = Number(document.getElementById('gross').value || 0);
     const pension = Number(document.getElementById('pension').value || 0);
@@ -31,21 +24,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('payeResult').innerText = `Estimated PAYE: ₦${tax.toLocaleString()}`;
   }
 
-  // ===== VAT/CONSUMPTION CALCULATOR =====
   function calculateVAT(amount, details, type) {
     const vatAmount = type === 'VAT' ? amount * 0.075 : amount;
     addTransaction(new Date().toISOString().split('T')[0], type, vatAmount, details);
     document.getElementById('vatResult').innerText = `${type} Added: ₦${vatAmount.toLocaleString()}`;
   }
 
-  // ===== TRANSACTION MANAGEMENT =====
   function addTransaction(date, type, amount, details) {
     taxData.transactions.push({ date, type, amount, details });
     renderTransactions();
     updateSummary();
   }
 
-  // ===== RENDER HISTORY =====
   function renderTransactions() {
     const tbody = document.getElementById('historyBody');
     tbody.innerHTML = '';
@@ -56,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ===== SUMMARY & CHART =====
   function updateSummary() {
     const totalPAYE = taxData.transactions.filter(t => t.type === 'PAYE').reduce((sum, t) => sum + t.amount, 0);
     const totalVAT = taxData.transactions.filter(t => t.type === 'VAT').reduce((sum, t) => sum + t.amount, 0);
@@ -76,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== MANUAL VAT/CONSUMPTION ENTRY =====
   const addManualBtn = document.getElementById('addManualTransactionBtn');
   if (addManualBtn) {
     addManualBtn.addEventListener('click', e => {
@@ -90,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ===== FILE IMPORT & OCR EDITABLE =====
   const vatFileInput = document.getElementById('vatFileInput');
   const ocrPreview = document.getElementById('ocrPreview');
   const confirmBtn = document.getElementById('confirmOCR');
@@ -131,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
         matches.forEach(numStr => {
           const rawAmount = Number(numStr.replace(/,/g, ''));
           if (rawAmount > 0) {
-            // ===== SMART TYPE DETECTION =====
+      
             let type = 'Consumption';
             if (/vat|tax|excise/i.test(line)) type = 'VAT';
             else if (rawAmount < 1000 && /vat|tax/i.test(line)) type = 'VAT';
-            // Clean details
+   
             const details = line.replace(numStr, '').trim() || 'Receipt Entry';
             const lineObj = { type, amount: rawAmount, details };
             ocrLines.push(lineObj);
@@ -180,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ===== INITIALIZE CHART =====
   const ctx = document.getElementById('taxChart').getContext('2d');
   chart = new Chart(ctx, {
     type: 'pie',
@@ -194,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
   });
 
-  // ===== INITIALIZE PAGES =====
   showPage('salary');
 
 });
+
