@@ -1,21 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Login | TaxTrack NG</title>
-<link rel="stylesheet" href="login.css">
+  <meta charset="UTF-8">
+  <title>Sign In | TaxTrack NG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to TaxTrack NG to track your Nigerian taxes.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="login.css">
 </head>
-<body class="auth-body">
-<div class="auth-container">
-  <h2>Login to TaxTrack NG</h2>
-  <form action="profile.html">
-    <input type="email" placeholder="Email" required>
-    <input type="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-  </form>
-  <p class="auth-footer">
-    Don't have an account? <a href="signup.html">Sign Up</a>
-  </p>
-</div>
+<body>
+
+  <div class="auth-container">
+    <!-- Logo -->
+    <a href="index.html" class="auth-logo">
+      <div class="auth-logo-icon"></div>
+      <span class="auth-logo-text">TaxTrack NG</span>
+    </a>
+    
+    <!-- Auth Card -->
+    <div class="auth-card">
+      <h2>Welcome back</h2>
+      <p class="auth-subtitle">Sign in to continue tracking your taxes</p>
+      
+      <!-- Error Message -->
+      <div id="errorMessage" class="error-banner" style="display: none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText"></span>
+      </div>
+      
+      <form class="auth-form" id="loginForm">
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <div class="input-wrapper">
+            <input type="email" id="email" name="email" placeholder="name@example.com" required autocomplete="email">
+            <i class="fas fa-envelope"></i>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+            <i class="fas fa-lock"></i>
+          </div>
+        </div>
+        
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" name="remember" id="remember">
+            Remember me
+          </label>
+          <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
+        </div>
+        
+        <button type="submit" class="auth-btn" id="submitBtn">
+          Sign In
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+      
+      <div class="auth-divider">or continue with</div>
+      
+      <div class="social-btns">
+        <button type="button" class="social-btn" aria-label="Sign in with Google" onclick="handleSocialLogin('google')">
+          <i class="fab fa-google"></i>
+        </button>
+        <button type="button" class="social-btn" aria-label="Sign in with Apple" onclick="handleSocialLogin('apple')">
+          <i class="fab fa-apple"></i>
+        </button>
+        <button type="button" class="social-btn" aria-label="Sign in with Microsoft" onclick="handleSocialLogin('microsoft')">
+          <i class="fab fa-microsoft"></i>
+        </button>
+      </div>
+      
+      <p class="auth-footer">
+        Don't have an account? <a href="signup.html">Create one</a>
+      </p>
+    </div>
+    
+    <a href="index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      Back to home
+    </a>
+  </div>
+
+  <style>
+    .error-banner {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ff6b6b;
+      font-size: 0.9rem;
+    }
+    .error-banner i {
+      font-size: 1.1rem;
+    }
+  </style>
+
+  <script src="app.js"></script>
+  <script>
+    // Check if already logged in
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.TaxTrack && window.TaxTrack.isLoggedIn()) {
+        window.location.href = 'dashboard.html';
+      }
+      
+      // Pre-fill email if remembered
+      const rememberedEmail = localStorage.getItem('taxtrack_rememberedEmail');
+      if (rememberedEmail) {
+        document.getElementById('email').value = rememberedEmail;
+        document.getElementById('remember').checked = true;
+      }
+    });
+
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const remember = document.getElementById('remember').checked;
+      const btn = document.getElementById('submitBtn');
+      const errorDiv = document.getElementById('errorMessage');
+      
+      // Hide previous errors
+      errorDiv.style.display = 'none';
+      
+      // Basic validation
+      if (!email || !password) {
+        showError('Please fill in all fields.');
+        return;
+      }
+      
+      // Show loading state
+      btn.classList.add('loading');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+      
+      // Simulate network delay
+      setTimeout(() => {
+        // Login via app
+        const result = window.TaxTrack.login(email, password, remember);
+        
+        if (result.success) {
+          // Remember email if checked
+          if (remember) {
+            localStorage.setItem('taxtrack_rememberedEmail', email);
+          } else {
+            localStorage.removeItem('taxtrack_rememberedEmail');
+          }
+          
+          // Show success and redirect
+          window.TaxTrack.showToast(result.message, 'success');
+          
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 500);
+        } else {
+          showError(result.message);
+          btn.classList.remove('loading');
+          btn.innerHTML = 'Sign In <i class="fas fa-arrow-right"></i>';
+        }
+      }, 800);
+    });
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      const errorText = document.getElementById('errorText');
+      errorText.textContent = message;
+      errorDiv.style.display = 'flex';
+    }
+
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      alert('Password reset would be sent to your email. For this demo, just use any email to log in!');
+    }
+
+    function handleSocialLogin(provider) {
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('loading');
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Connecting to ${provider}...`;
+      
+      // Simulate social login
+      setTimeout(() => {
+        const demoEmail = `user@${provider}.com`;
+        const result = window.TaxTrack.login(demoEmail, 'demo123', false);
+        
+        if (result.success) {
+          window.TaxTrack.showToast(`Signed in with ${provider}!`, 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 500);
+        }
+      }, 1000);
+    }
+  </script>
 </body>
 </html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Account | TaxTrack NG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your TaxTrack NG account to start tracking Nigerian taxes.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="signup.css">
+</head>
+<body>
+
+  <div class="auth-container">
+    <!-- Logo -->
+    <a href="index.html" class="auth-logo">
+      <div class="auth-logo-icon"></div>
+      <span class="auth-logo-text">TaxTrack NG</span>
+    </a>
+    
+    <!-- Auth Card -->
+    <div class="auth-card">
+      <h2 class="auth-title">Create your account</h2>
+      <p class="auth-subtitle">Start tracking your taxes in minutes</p>
+      
+      <!-- Error Message -->
+      <div id="errorMessage" class="error-banner" style="display: none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText"></span>
+      </div>
+      
+      <form class="auth-form" id="signupForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First name</label>
+            <div class="input-wrapper">
+              <input type="text" id="firstName" name="firstName" placeholder="John" required autocomplete="given-name">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName">Last name</label>
+            <div class="input-wrapper">
+              <input type="text" id="lastName" name="lastName" placeholder="Doe" required autocomplete="family-name">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <div class="input-wrapper">
+            <input type="email" id="email" name="email" placeholder="name@example.com" required autocomplete="email">
+            <i class="fas fa-envelope"></i>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone number</label>
+          <div class="input-wrapper">
+            <input type="tel" id="phone" name="phone" placeholder="+234 800 000 0000" required autocomplete="tel">
+            <i class="fas fa-phone"></i>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="employment">Employment type</label>
+          <select id="employment" name="employment" required>
+            <option value="">Select your employment type</option>
+            <option value="Salary Earner">Salary Earner</option>
+            <option value="Freelancer">Freelancer</option>
+            <option value="Business Owner">Business Owner</option>
+            <option value="Contractor">Contractor</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" name="password" placeholder="Create a strong password" required minlength="8" autocomplete="new-password">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+            <div class="strength-bar"></div>
+          </div>
+          <small id="passwordHint" class="password-hint">Use at least 8 characters with uppercase, lowercase, numbers, and symbols</small>
+        </div>
+        
+        <div class="form-group">
+          <label class="terms-label">
+            <input type="checkbox" name="terms" id="terms" required>
+            <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+          </label>
+        </div>
+        
+        <button type="submit" class="primary-btn full-width" id="submitBtn">
+          Create Account
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+      
+      <div class="auth-divider">or sign up with</div>
+      
+      <div class="social-btns">
+        <button type="button" class="social-btn" aria-label="Sign up with Google" onclick="handleSocialSignup('Google')">
+          <i class="fab fa-google"></i>
+        </button>
+        <button type="button" class="social-btn" aria-label="Sign up with Apple" onclick="handleSocialSignup('Apple')">
+          <i class="fab fa-apple"></i>
+        </button>
+        <button type="button" class="social-btn" aria-label="Sign up with Microsoft" onclick="handleSocialSignup('Microsoft')">
+          <i class="fab fa-microsoft"></i>
+        </button>
+      </div>
+      
+      <p class="auth-footer">
+        Already have an account? <a href="login.html">Sign in</a>
+      </p>
+    </div>
+    
+    <a href="index.html" class="back-home">
+      <i class="fas fa-arrow-left"></i>
+      Back to home
+    </a>
+  </div>
+
+  <style>
+    .error-banner {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ff6b6b;
+      font-size: 0.9rem;
+    }
+    .error-banner i {
+      font-size: 1.1rem;
+    }
+    .password-hint {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+    .password-hint.valid {
+      color: var(--success);
+    }
+  </style>
+
+  <script src="app.js"></script>
+  <script>
+    // Check if already logged in
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.TaxTrack && window.TaxTrack.isLoggedIn()) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    // Password strength indicator
+    const passwordInput = document.getElementById('password');
+    const strengthBars = document.querySelectorAll('.strength-bar');
+    const passwordHint = document.getElementById('passwordHint');
+    
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      let strength = 0;
+      let hints = [];
+      
+      if (password.length >= 8) {
+        strength++;
+      } else {
+        hints.push('8+ characters');
+      }
+      
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+        strength++;
+      } else {
+        hints.push('uppercase & lowercase');
+      }
+      
+      if (/\d/.test(password)) {
+        strength++;
+      } else {
+        hints.push('numbers');
+      }
+      
+      if (/[^a-zA-Z0-9]/.test(password)) {
+        strength++;
+      } else {
+        hints.push('symbols');
+      }
+      
+      strengthBars.forEach((bar, index) => {
+        bar.classList.remove('active', 'medium', 'strong');
+        if (index < strength) {
+          bar.classList.add('active');
+          if (strength === 2) bar.classList.add('medium');
+          if (strength >= 3) bar.classList.add('strong');
+        }
+      });
+      
+      if (strength === 4) {
+        passwordHint.textContent = '✓ Strong password!';
+        passwordHint.classList.add('valid');
+      } else {
+        passwordHint.textContent = `Add: ${hints.join(', ')}`;
+        passwordHint.classList.remove('valid');
+      }
+    });
+    
+    // Form submission
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const employment = document.getElementById('employment').value;
+      const password = document.getElementById('password').value;
+      const terms = document.getElementById('terms').checked;
+      
+      const btn = document.getElementById('submitBtn');
+      const errorDiv = document.getElementById('errorMessage');
+      
+      // Hide previous errors
+      errorDiv.style.display = 'none';
+      
+      // Validation
+      if (!firstName || !lastName || !email || !phone || !employment || !password) {
+        showError('Please fill in all fields.');
+        return;
+      }
+      
+      if (password.length < 8) {
+        showError('Password must be at least 8 characters.');
+        return;
+      }
+      
+      if (!terms) {
+        showError('Please accept the Terms of Service and Privacy Policy.');
+        return;
+      }
+      
+      // Show loading state
+      btn.classList.add('loading');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+      
+      // Simulate network delay
+      setTimeout(() => {
+        // Signup via app
+        const userData = {
+          firstName,
+          lastName,
+          email,
+          phone,
+          employment,
+          company: '',
+          taxId: generateTaxId(),
+          taxOffice: 'Federal Inland Revenue Service'
+        };
+        
+        const result = window.TaxTrack.signup(userData);
+        
+        if (result.success) {
+          window.TaxTrack.showToast('Account created successfully! Welcome to TaxTrack NG.', 'success');
+          
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 800);
+        } else {
+          showError(result.message);
+          btn.classList.remove('loading');
+          btn.innerHTML = 'Create Account <i class="fas fa-arrow-right"></i>';
+        }
+      }, 1200);
+    });
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      const errorText = document.getElementById('errorText');
+      errorText.textContent = message;
+      errorDiv.style.display = 'flex';
+      // Scroll to error
+      errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function generateTaxId() {
+      // Generate a random TIN-like number
+      const part1 = Math.floor(Math.random() * 900 + 100);
+      const part2 = Math.floor(Math.random() * 90 + 10);
+      const part3 = Math.floor(Math.random() * 9000 + 1000);
+      return `${part1}-${part2}-${part3}`;
+    }
+
+    function handleSocialSignup(provider) {
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('loading');
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Connecting to ${provider}...`;
+      
+      // Simulate social signup
+      setTimeout(() => {
+        const userData = {
+          firstName: 'Demo',
+          lastName: 'User',
+          email: `user@${provider.toLowerCase()}.com`,
+          phone: '+234 800 000 0000',
+          employment: 'Salary Earner',
+          company: `${provider} Inc.`,
+          taxId: generateTaxId(),
+          taxOffice: 'Federal Inland Revenue Service'
+        };
+        
+        const result = window.TaxTrack.signup(userData);
+        
+        if (result.success) {
+          window.TaxTrack.showToast(`Signed up with ${provider}!`, 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 500);
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

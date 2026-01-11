@@ -1,186 +1,311 @@
+/**
+ * TaxTrack NG - Dashboard OCR & File Processing
+ * Handles receipt scanning and CSV imports
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
-
-  let taxData = { paye: 0, vat: 0, consumption: 0, transactions: [] };
-  let chart;
-
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-    document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
-    const activeLink = document.querySelector(`[data-page="${id}"]`);
-    if (activeLink) activeLink.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Only run if TaxTrack app is loaded
+  if (!window.TaxTrack) {
+    console.warn('TaxTrack app not loaded');
+    return;
   }
 
-  function calculatePAYE() {
-    const gross = Number(document.getElementById('gross').value || 0);
-    const pension = Number(document.getElementById('pension').value || 0);
-    const nhf = Number(document.getElementById('nhf').value || 0);
-    const other = Number(document.getElementById('otherReliefs').value || 0);
-    const reliefs = pension + nhf + other + 200000;
-    const taxable = Math.max(gross - reliefs, 0);
-    const tax = taxable * 0.15;
-    addTransaction(new Date().toISOString().split('T')[0], 'PAYE', tax, 'Salary Tax Calculation');
-    document.getElementById('payeResult').innerText = `Estimated PAYE: ₦${tax.toLocaleString()}`;
-  }
-
-  function calculateVAT(amount, details, type) {
-    const vatAmount = type === 'VAT' ? amount * 0.075 : amount;
-    addTransaction(new Date().toISOString().split('T')[0], type, vatAmount, details);
-    document.getElementById('vatResult').innerText = `${type} Added: ₦${vatAmount.toLocaleString()}`;
-  }
-
-  function addTransaction(date, type, amount, details) {
-    taxData.transactions.push({ date, type, amount, details });
-    renderTransactions();
-    updateSummary();
-  }
-
-  function renderTransactions() {
-    const tbody = document.getElementById('historyBody');
-    tbody.innerHTML = '';
-    taxData.transactions.forEach(tx => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${tx.date}</td><td>${tx.type}</td><td>₦${tx.amount.toLocaleString()}</td><td>${tx.details}</td>`;
-      tbody.appendChild(row);
-    });
-  }
-
-  function updateSummary() {
-    const totalPAYE = taxData.transactions.filter(t => t.type === 'PAYE').reduce((sum, t) => sum + t.amount, 0);
-    const totalVAT = taxData.transactions.filter(t => t.type === 'VAT').reduce((sum, t) => sum + t.amount, 0);
-    const totalConsumption = taxData.transactions.filter(t => t.type === 'Consumption').reduce((sum, t) => sum + t.amount, 0);
-
-    taxData.paye = totalPAYE;
-    taxData.vat = totalVAT;
-    taxData.consumption = totalConsumption;
-
-    document.getElementById('cardIncome').innerText = `₦${totalPAYE.toLocaleString()}`;
-    document.getElementById('cardVAT').innerText = `₦${totalVAT.toLocaleString()}`;
-    document.getElementById('cardConsumption').innerText = `₦${totalConsumption.toLocaleString()}`;
-
-    if (chart) {
-      chart.data.datasets[0].data = [totalPAYE, totalVAT, totalConsumption];
-      chart.update();
-    }
-  }
-
-  const addManualBtn = document.getElementById('addManualTransactionBtn');
-  if (addManualBtn) {
-    addManualBtn.addEventListener('click', e => {
-      e.preventDefault();
-      const amount = Number(document.getElementById('vatAmountManual').value || 0);
-      const details = document.getElementById('vatDetailsManual').value || 'Manual Entry';
-      const type = document.getElementById('vatTypeManual').value;
-      if (amount > 0) calculateVAT(amount, details, type);
-      document.getElementById('vatAmountManual').value = '';
-      document.getElementById('vatDetailsManual').value = '';
-    });
-  }
-
+  // OCR Preview elements
   const vatFileInput = document.getElementById('vatFileInput');
   const ocrPreview = document.getElementById('ocrPreview');
   const confirmBtn = document.getElementById('confirmOCR');
+  
+  if (!vatFileInput || !ocrPreview || !confirmBtn) {
+    return; // Elements not on this page
+  }
 
-  if (vatFileInput && ocrPreview && confirmBtn) {
-    let ocrLines = [];
+  let ocrLines = [];
 
-    vatFileInput.addEventListener('change', async e => {
-      const files = Array.from(e.target.files);
-      ocrPreview.innerHTML = '';
-      document.getElementById('vatResult').innerText = 'Processing receipts, please wait...';
+  // File input handler
+  vatFileInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    ocrPreview.innerHTML = '';
+    ocrLines = [];
+    
+    const vatResult = document.getElementById('vatResult');
+    if (vatResult) {
+      vatResult.style.display = 'block';
+      vatResult.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing files, please wait...';
+    }
 
-      for (const file of files) {
-        if (!file.name.endsWith('.csv')) {
-          await processReceiptEditable(file);
+    let hasImages = false;
+    let csvProcessed = 0;
+    
+    for (const file of files) {
+      if (file.name.toLowerCase().endsWith('.csv')) {
+        await processCSV(file);
+        csvProcessed++;
+      } else if (file.type.startsWith('image/')) {
+        hasImages = true;
+        await processReceiptWithOCR(file);
+      }
+    }
+
+    if (hasImages && ocrLines.length > 0) {
+      confirmBtn.style.display = 'flex';
+      if (vatResult) {
+        vatResult.innerHTML = '<i class="fas fa-info-circle"></i> Review OCR results below, then click "Confirm Selected Transactions"';
+      }
+    } else if (csvProcessed > 0) {
+      if (vatResult) {
+        vatResult.innerHTML = `<i class="fas fa-check-circle"></i> ${csvProcessed} CSV file(s) processed successfully!`;
+      }
+      // Refresh transactions display
+      if (typeof renderTransactions === 'function') renderTransactions();
+      if (typeof updateSummary === 'function') updateSummary();
+    } else if (!hasImages) {
+      if (vatResult) {
+        vatResult.style.display = 'none';
+      }
+    }
+  });
+
+  // Process CSV file
+  async function processCSV(file) {
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      let addedCount = 0;
+      
+      // Skip header row if it looks like a header
+      const startIndex = lines[0].toLowerCase().includes('date') || 
+                        lines[0].toLowerCase().includes('amount') ? 1 : 0;
+      
+      for (let i = startIndex; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
+        
+        if (cols.length >= 2) {
+          // Try to find an amount in the columns
+          let amount = 0;
+          let details = '';
+          
+          for (const col of cols) {
+            const numVal = parseFloat(col.replace(/[₦,]/g, ''));
+            if (!isNaN(numVal) && numVal > 0 && amount === 0) {
+              amount = numVal;
+            } else if (col && !numVal && col.length > 2) {
+              details = col;
+            }
+          }
+          
+          if (amount > 0) {
+            const vatAmount = window.TaxTrack.calculateVAT(amount);
+            window.TaxTrack.addTransaction({
+              type: 'VAT',
+              amount: vatAmount,
+              details: details || `CSV Import: ${file.name}`
+            });
+            addedCount++;
+          }
         }
       }
+      
+      if (addedCount > 0) {
+        window.TaxTrack.showToast(`Added ${addedCount} transactions from ${file.name}`, 'success');
+      }
+      
+    } catch (error) {
+      console.error('CSV Error:', error);
+      window.TaxTrack.showToast(`Error processing ${file.name}`, 'error');
+    }
+  }
 
-      document.getElementById('vatResult').innerText = 'Edit lines if needed, then click "Add Selected Transactions".';
-    });
-
-    async function processReceiptEditable(file) {
-      if (!window.Tesseract) {
+  // Process receipt with OCR
+  async function processReceiptWithOCR(file) {
+    // Load Tesseract.js if not already loaded
+    if (!window.Tesseract) {
+      try {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js';
         document.head.appendChild(script);
-        await new Promise(resolve => script.onload = resolve);
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+        });
+      } catch (error) {
+        console.error('Failed to load Tesseract:', error);
+        window.TaxTrack.showToast('Failed to load OCR library', 'error');
+        return;
       }
+    }
 
-      document.getElementById('vatResult').innerText = `Analyzing ${file.name}...`;
+    const vatResult = document.getElementById('vatResult');
+    if (vatResult) {
+      vatResult.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analyzing ${file.name}...`;
+    }
 
-      const { data: { text } } = await Tesseract.recognize(file, 'eng', { logger: m => console.log(m) });
-      ocrLines = [];
-      ocrPreview.innerHTML = `<h4>OCR Preview for ${file.name}</h4>`;
-
-      text.split('\n').forEach((line, idx) => {
-        const matches = line.match(/(\d{2,3}(?:,\d{3})*(?:\.\d{2})?)/g) || [];
-        matches.forEach(numStr => {
-          const rawAmount = Number(numStr.replace(/,/g, ''));
-          if (rawAmount > 0) {
+    try {
+      const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+        logger: m => {
+          if (m.status === 'recognizing text' && vatResult) {
+            const progress = Math.round(m.progress * 100);
+            vatResult.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Scanning: ${progress}%`;
+          }
+        }
+      });
       
+      // Create preview header
+      const headerDiv = document.createElement('div');
+      headerDiv.innerHTML = `
+        <h4 style="color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-receipt"></i> 
+          OCR Results: ${file.name}
+        </h4>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+          Review detected amounts and edit if needed. Check the items you want to add.
+        </p>
+      `;
+      ocrPreview.appendChild(headerDiv);
+
+      // Parse OCR text for amounts
+      const lines = text.split('\n');
+      let foundItems = 0;
+      
+      lines.forEach((line, lineIndex) => {
+        // Match various number formats
+        const matches = line.match(/[\d,]+\.?\d{0,2}/g) || [];
+        
+        matches.forEach(numStr => {
+          const rawAmount = parseFloat(numStr.replace(/,/g, ''));
+          
+          // Filter reasonable amounts (between 100 and 10 million Naira)
+          if (rawAmount >= 100 && rawAmount <= 10000000) {
+            // Determine type based on context
             let type = 'Consumption';
-            if (/vat|tax|excise/i.test(line)) type = 'VAT';
-            else if (rawAmount < 1000 && /vat|tax/i.test(line)) type = 'VAT';
-   
-            const details = line.replace(numStr, '').trim() || 'Receipt Entry';
-            const lineObj = { type, amount: rawAmount, details };
+            const lineLower = line.toLowerCase();
+            if (/vat|tax|excise|levy/.test(lineLower)) {
+              type = 'VAT';
+            }
+            
+            // Clean up details
+            let details = line
+              .replace(numStr, '')
+              .replace(/[^\w\s]/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+              .substring(0, 50);
+            
+            if (!details || details.length < 3) {
+              details = 'Receipt Item';
+            }
+            
+            const lineId = `ocr-${lineIndex}-${rawAmount}-${Math.random().toString(36).substr(2, 4)}`;
+            const lineObj = { 
+              id: lineId,
+              type, 
+              amount: rawAmount, 
+              details 
+            };
             ocrLines.push(lineObj);
 
+            // Create editable row
             const lineDiv = document.createElement('div');
-            lineDiv.style.marginBottom = '6px';
+            lineDiv.className = 'ocr-line';
+            lineDiv.style.cssText = `
+              display: flex; 
+              align-items: center; 
+              gap: 12px; 
+              margin-bottom: 12px; 
+              padding: 14px 16px; 
+              background: var(--glass-bg); 
+              border: 1px solid var(--border);
+              border-radius: 12px; 
+              flex-wrap: wrap;
+            `;
             lineDiv.innerHTML = `
-              <input type="checkbox" id="ocrLine${idx}-${rawAmount}" checked>
-              <input type="number" id="ocrAmount${idx}-${rawAmount}" value="${rawAmount}" style="width:80px;margin-left:5px;">
-              <select id="ocrType${idx}-${rawAmount}" style="margin-left:5px;">
-                <option value="VAT" ${type==='VAT'?'selected':''}>VAT</option>
-                <option value="Consumption" ${type==='Consumption'?'selected':''}>Consumption</option>
+              <input type="checkbox" id="check-${lineId}" checked 
+                style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;">
+              <input type="number" id="amount-${lineId}" value="${rawAmount}" 
+                style="width: 120px; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: var(--font-mono);">
+              <select id="type-${lineId}" 
+                style="padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); min-width: 130px;">
+                <option value="VAT" ${type === 'VAT' ? 'selected' : ''}>VAT (7.5%)</option>
+                <option value="Consumption" ${type === 'Consumption' ? 'selected' : ''}>Consumption</option>
               </select>
-              <input type="text" id="ocrDetails${idx}-${rawAmount}" value="${details}" style="width:400px;margin-left:5px;">
+              <input type="text" id="details-${lineId}" value="${details}" 
+                style="flex: 1; min-width: 180px; padding: 10px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
             `;
             ocrPreview.appendChild(lineDiv);
+            foundItems++;
           }
         });
       });
+
+      if (foundItems === 0) {
+        ocrPreview.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+            <i class="fas fa-search" style="font-size: 2.5rem; margin-bottom: 16px; display: block; opacity: 0.5;"></i>
+            <p>No amounts detected in this receipt.</p>
+            <p style="font-size: 0.85rem; margin-top: 8px;">Try a clearer image or enter the amounts manually above.</p>
+          </div>
+        `;
+        confirmBtn.style.display = 'none';
+      }
+      
+    } catch (error) {
+      console.error('OCR Error:', error);
+      const vatResult = document.getElementById('vatResult');
+      if (vatResult) {
+        vatResult.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error processing image. Please try again.`;
+      }
+      window.TaxTrack.showToast('OCR processing failed', 'error');
     }
-
-    confirmBtn.addEventListener('click', () => {
-      const dateStr = new Date().toISOString().split('T')[0];
-      ocrLines.forEach((line, idx) => {
-        const checkbox = document.getElementById(`ocrLine${idx}-${line.amount}`);
-        const amountInput = document.getElementById(`ocrAmount${idx}-${line.amount}`);
-        const typeSelect = document.getElementById(`ocrType${idx}-${line.amount}`);
-        const detailsInput = document.getElementById(`ocrDetails${idx}-${line.amount}`);
-
-        if (checkbox && checkbox.checked && amountInput && typeSelect && detailsInput) {
-          const amount = Number(amountInput.value);
-          const type = typeSelect.value;
-          const details = detailsInput.value;
-          if (type === 'VAT') addTransaction(dateStr, 'VAT', amount * 0.075, details);
-          else addTransaction(dateStr, 'Consumption', amount, details);
-        }
-      });
-
-      ocrPreview.innerHTML = '';
-      document.getElementById('vatResult').innerText = 'Selected transactions added successfully.';
-      vatFileInput.value = '';
-    });
   }
 
-  const ctx = document.getElementById('taxChart').getContext('2d');
-  chart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: ['Income Tax', 'VAT', 'Consumption'],
-      datasets: [{
-        data: [0, 0, 0],
-        backgroundColor: ['#1ea672', '#16a085', '#10b981']
-      }]
-    },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  // Confirm OCR transactions
+  confirmBtn.addEventListener('click', () => {
+    let addedCount = 0;
+
+    ocrLines.forEach(line => {
+      const checkbox = document.getElementById(`check-${line.id}`);
+      const amountInput = document.getElementById(`amount-${line.id}`);
+      const typeSelect = document.getElementById(`type-${line.id}`);
+      const detailsInput = document.getElementById(`details-${line.id}`);
+
+      if (checkbox && checkbox.checked && amountInput && typeSelect && detailsInput) {
+        const amount = parseFloat(amountInput.value);
+        const type = typeSelect.value;
+        const details = detailsInput.value;
+
+        if (amount > 0) {
+          // Calculate VAT if type is VAT
+          const finalAmount = type === 'VAT' 
+            ? window.TaxTrack.calculateVAT(amount) 
+            : amount;
+          
+          window.TaxTrack.addTransaction({
+            type: type,
+            amount: finalAmount,
+            details: type === 'VAT' ? `${details} (Base: ₦${amount.toLocaleString()})` : details
+          });
+          addedCount++;
+        }
+      }
+    });
+
+    // Clear preview
+    ocrPreview.innerHTML = '';
+    confirmBtn.style.display = 'none';
+    ocrLines = [];
+
+    const vatResult = document.getElementById('vatResult');
+    if (vatResult) {
+      vatResult.innerHTML = `<i class="fas fa-check-circle"></i> ${addedCount} transaction(s) added successfully!`;
+    }
+
+    vatFileInput.value = '';
+
+    // Refresh dashboard displays
+    if (typeof renderTransactions === 'function') renderTransactions();
+    if (typeof updateSummary === 'function') updateSummary();
+
+    window.TaxTrack.showToast(`Added ${addedCount} transactions from receipt`, 'success');
   });
 
-  showPage('salary');
-
 });
-

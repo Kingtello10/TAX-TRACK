@@ -4,222 +4,446 @@
   <meta charset="UTF-8" />
   <title>TaxTrack NG | Nigeria Tax Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+  <meta name="description" content="Track VAT, income tax, and daily consumption taxes in Nigeria with clarity and precision." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <link rel="stylesheet" href="css/style.css">
-  <style>
-
-
-    body { background: var(--bg); }
-
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 40px;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .navbar .logo {
-      font-weight: 700;
-      font-size: 24px;
-      color: var(--primary);
-    }
-
-    .menu {
-      position: relative;
-    }
-
-    .menu .menu-btn {
-      background: transparent;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: var(--text-dark);
-    }
-
-    .menu .dropdown {
-      position: absolute;
-      right: 0;
-      top: 50px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      display: none;
-      flex-direction: column;
-      min-width: 160px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-
-    .menu .dropdown.show { display: flex; }
-
-    .menu .dropdown a {
-      padding: 12px 18px;
-      text-decoration: none;
-      color: var(--text-dark);
-      transition: background 0.2s;
-    }
-
-    .menu .dropdown a:hover { background: var(--bg); }
-
-    .hero {
-      max-width: 900px;
-      margin: 80px auto;
-      text-align: center;
-      padding: 0 20px;
-    }
-
-    .hero h1 {
-      font-size: 38px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--primary);
-    }
-
-    .hero p {
-      font-size: 16px;
-      color: var(--text-muted);
-      margin-bottom: 30px;
-    }
-
-    .primary-btn {
-      background: var(--accent);
-      color: white;
-      padding: 14px 28px;
-      font-weight: 500;
-      border-radius: 12px;
-      text-decoration: none;
-      display: inline-block;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .primary-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    }
-
-    #questions {
-      margin-top: 20px;
-      font-weight: 500;
-      font-size: 18px;
-      color: var(--primary);
-      min-height: 28px;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-      max-width: 1000px;
-      margin: 80px auto;
-      padding: 0 20px;
-    }
-
-    .features .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 28px 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .features .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-    }
-
-    .features .card h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
-      color: var(--primary);
-    }
-
-    .features .card p {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .footer {
-      text-align: center;
-      padding: 36px 20px;
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      margin-top: 80px;
-    }
-
-    .footer .socials a {
-      color: var(--text-dark);
-      margin: 0 10px;
-      font-size: 20px;
-      transition: color 0.2s;
-    }
-
-    .footer .socials a:hover {
-      color: var(--accent);
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Floating orbs for visual depth -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
   <nav class="navbar">
     <div class="logo">TaxTrack NG</div>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="login.html" class="nav-link btn-nav">Sign In</a>
+    </div>
     <div class="menu">
-      <button class="menu-btn" onclick="toggleMenu()">
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>
       </button>
       <div class="dropdown" id="dropdown">
+        <a href="#features">Features</a>
         <a href="dashboard.html">Dashboard</a>
         <a href="profile.html">Profile</a>
-        <a href="#">About Us</a>
-        <a href="#">Privacy Policy</a>
+        <a href="login.html">Sign In</a>
       </div>
     </div>
   </nav>
 
   <section class="hero">
-    <h1>Understand Your Taxes Clearly</h1>
-    <p>Track VAT, income tax, and daily consumption taxes in Nigeria.</p>
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Nigeria's Tax Tracking Platform
+    </div>
+    <h1>Understand Your Taxes<br />With Clarity</h1>
+    <p>Track VAT, income tax, and daily consumption taxes in Nigeria. Get real-time insights and take control of your finances.</p>
+    
+    <div class="hero-actions">
+      <a href="login.html" class="primary-btn">
+        Get Started Free
+        <i class="fas fa-arrow-right"></i>
+      </a>
+      <a href="#features" class="secondary-btn">
+        <i class="fas fa-play-circle"></i>
+        See How It Works
+      </a>
+    </div>
 
-    <a href="login.html" class="primary-btn">Get Started</a>
-
-    <div class="questions" id="questions">
-      How much VAT do you pay daily?
+    <div class="questions" id="questions"></div>
+    
+    <!-- Stats row -->
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-value">₦2.5T+</span>
+        <span class="stat-label">Taxes Tracked</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-value">50K+</span>
+        <span class="stat-label">Active Users</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-value">99.9%</span>
+        <span class="stat-label">Accuracy</span>
+      </div>
     </div>
   </section>
 
-  <section class="features">
+  <section class="features" id="features">
     <div class="card">
+      <div class="icon">
+        <i class="fas fa-receipt"></i>
+      </div>
       <h3>VAT Tracking</h3>
-      <p>Automatically calculate 7.5% VAT from your everyday expenses.</p>
+      <p>Automatically calculate 7.5% VAT from your everyday expenses with intelligent receipt scanning.</p>
     </div>
     <div class="card">
+      <div class="icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
       <h3>Income Tax Insights</h3>
-      <p>Estimate PAYE and personal income tax with clarity.</p>
+      <p>Estimate PAYE and personal income tax with clarity. Know exactly what you owe.</p>
     </div>
     <div class="card">
+      <div class="icon">
+        <i class="fas fa-file-invoice"></i>
+      </div>
       <h3>Smart Reports</h3>
-      <p>Monthly and yearly summaries designed for simplicity.</p>
+      <p>Monthly and yearly summaries designed for simplicity. Export to CSV anytime.</p>
+    </div>
+  </section>
+
+  <!-- Trust Section -->
+  <section class="trust-section">
+    <div class="trust-content">
+      <h2>Trusted by Nigerian Professionals</h2>
+      <p>Join thousands of employees, freelancers, and SMEs who track their taxes with TaxTrack NG.</p>
+      <div class="trust-badges">
+        <div class="trust-badge">
+          <i class="fas fa-shield-halved"></i>
+          <span>Bank-Level Security</span>
+        </div>
+        <div class="trust-badge">
+          <i class="fas fa-lock"></i>
+          <span>Data Encrypted</span>
+        </div>
+        <div class="trust-badge">
+          <i class="fas fa-check-circle"></i>
+          <span>FIRS Compliant</span>
+        </div>
+      </div>
     </div>
   </section>
 
   <footer class="footer">
-    <p>© 2026 TaxTrack NG. All rights reserved.</p>
-    <div class="socials">
-      <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-      <a href="#"><i class="fa-brands fa-instagram"></i></a>
-      <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="logo">TaxTrack NG</div>
+        <p>Making tax tracking simple for every Nigerian.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 TaxTrack NG. All rights reserved.</p>
+      <div class="socials">
+        <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
     </div>
   </footer>
 
- <script>
-   
+  <style>
+    /* Additional page-specific styles */
+    
+    /* Background orbs */
+    .bg-orbs {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+    }
+    
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      background: rgba(0, 212, 170, 0.15);
+      top: -200px;
+      right: -100px;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: rgba(0, 184, 148, 0.1);
+      bottom: 10%;
+      left: -100px;
+      animation: float 25s ease-in-out infinite reverse;
+    }
+    
+    .orb-3 {
+      width: 300px;
+      height: 300px;
+      background: rgba(0, 206, 201, 0.1);
+      top: 50%;
+      right: 20%;
+      animation: float 18s ease-in-out infinite 5s;
+    }
+    
+    /* Nav links (desktop) */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    
+    .nav-link {
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: var(--transition-fast);
+    }
+    
+    .nav-link:hover {
+      color: var(--accent);
+    }
+    
+    .btn-nav {
+      padding: 10px 24px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary) !important;
+    }
+    
+    .btn-nav:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--primary) !important;
+    }
+    
+    .menu {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .menu { display: block; }
+    }
+    
+    /* Hero badge */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      background: rgba(0, 212, 170, 0.1);
+      border: 1px solid rgba(0, 212, 170, 0.2);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 32px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    /* Hero actions */
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    
+    /* Hero stats */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      margin-top: 80px;
+      padding: 32px 48px;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      backdrop-filter: var(--glass-blur);
+      animation: fadeInUp 0.8s ease-out 0.4s backwards;
+    }
+    
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--glass-border);
+    }
+    
+    @media (max-width: 600px) {
+      .hero-stats {
+        flex-direction: column;
+        gap: 24px;
+        padding: 28px 32px;
+      }
+      .stat-divider {
+        width: 60px;
+        height: 1px;
+      }
+    }
+    
+    /* Trust section */
+    .trust-section {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto 100px;
+      padding: 0 32px;
+      text-align: center;
+    }
+    
+    .trust-content h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+    
+    .trust-content > p {
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+    
+    .trust-badges {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .trust-badge i {
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+    
+    /* Footer enhancements */
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      max-width: 1100px;
+      margin: 0 auto 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    
+    .footer-brand .logo {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+    
+    .footer-brand .logo::before {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .footer-brand p {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+    
+    .footer-links a {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      transition: var(--transition-fast);
+    }
+    
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+    
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    .footer-bottom p {
+      margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 24px;
+      }
+      .footer-links {
+        gap: 20px;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  </style>
+
+<script src="app.js"></script>
+<script>
+  // ===== TYPING ANIMATION =====
   const questions = [
     "How much VAT do you pay daily?",
     "Do you know your PAYE deductions?",
@@ -235,9 +459,9 @@
     if (charIndex < questions[index].length) {
       q.textContent += questions[index][charIndex];
       charIndex++;
-      setTimeout(typeQuestion, 50);
+      setTimeout(typeQuestion, 45);
     } else {
-      setTimeout(() => eraseQuestion(), 2000);
+      setTimeout(() => eraseQuestion(), 2500);
     }
   }
 
@@ -245,15 +469,16 @@
     if (charIndex > 0) {
       q.textContent = questions[index].substring(0, charIndex - 1);
       charIndex--;
-      setTimeout(eraseQuestion, 30);
+      setTimeout(eraseQuestion, 25);
     } else {
       index = (index + 1) % questions.length;
-      setTimeout(typeQuestion, 500);
+      setTimeout(typeQuestion, 400);
     }
   }
 
   typeQuestion();
-   
+
+  // ===== MOBILE MENU =====
   const dropdown = document.getElementById("dropdown");
   const menuBtn = document.querySelector(".menu-btn");
 
@@ -271,41 +496,83 @@
     link.addEventListener("click", () => dropdown.classList.remove("show"));
   });
 
-  function isUserLoggedIn() {
-    return localStorage.getItem("userLoggedIn") === "true";
-  }
+  // ===== UPDATE UI FOR AUTH STATE =====
+  document.addEventListener('DOMContentLoaded', function() {
+    updateNavForAuthState();
+  });
 
-  function isAdmin() {
-    return localStorage.getItem("userRole") === "admin";
-  }
-
-  const protectedPages = ["profile.html", "dashboard.html"];
-  const currentPage = window.location.pathname.split("/").pop();
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const adminKeyParam = urlParams.get('adminkey');
-  const ADMIN_KEY = "TAXTRACK2026"; // <-- your secret key
-
-  if (adminKeyParam === ADMIN_KEY) {
-    localStorage.setItem("userLoggedIn", "true");
-    localStorage.setItem("userRole", "admin");
-  }
-
-  if (protectedPages.includes(currentPage) && !isUserLoggedIn() && !isAdmin()) {
-    window.location.href = "login.html";
-  }
-
-  dropdown.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", (e) => {
-      const href = link.getAttribute("href");
-      if (protectedPages.includes(href) && !isUserLoggedIn() && !isAdmin()) {
+  function updateNavForAuthState() {
+    const isLoggedIn = window.TaxTrack && window.TaxTrack.isLoggedIn();
+    
+    // Desktop nav
+    const navLinks = document.querySelector('.nav-links');
+    const signInBtn = navLinks ? navLinks.querySelector('a[href="login.html"]') : null;
+    
+    if (isLoggedIn && signInBtn) {
+      const user = window.TaxTrack.getUser();
+      const firstName = user.firstName || 'User';
+      
+      signInBtn.href = 'dashboard.html';
+      signInBtn.innerHTML = `<i class="fas fa-user-circle"></i> ${firstName}`;
+    }
+    
+    // Mobile dropdown
+    const mobileSignIn = dropdown.querySelector('a[href="login.html"]');
+    if (isLoggedIn && mobileSignIn) {
+      mobileSignIn.href = 'dashboard.html';
+      mobileSignIn.textContent = 'Dashboard';
+      
+      // Add logout option
+      const logoutLink = document.createElement('a');
+      logoutLink.href = '#';
+      logoutLink.textContent = 'Logout';
+      logoutLink.onclick = function(e) {
         e.preventDefault();
-        window.location.href = "login.html";
+        if (confirm('Are you sure you want to logout?')) {
+          window.TaxTrack.logout();
+        }
+      };
+      dropdown.appendChild(logoutLink);
+    }
+    
+    // Update CTA button
+    const ctaBtn = document.querySelector('.hero-actions .primary-btn');
+    if (isLoggedIn && ctaBtn) {
+      ctaBtn.href = 'dashboard.html';
+      ctaBtn.innerHTML = 'Go to Dashboard <i class="fas fa-arrow-right"></i>';
+    }
+  }
+
+  // ===== SMOOTH SCROLL =====
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href !== '#') {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
     });
   });
+
+  // ===== ADMIN KEY SUPPORT =====
+  const urlParams = new URLSearchParams(window.location.search);
+  const adminKeyParam = urlParams.get('adminkey');
+  const ADMIN_KEY = "TAXTRACK2026";
+
+  if (adminKeyParam === ADMIN_KEY) {
+    // Quick admin login
+    window.TaxTrack.login('admin@taxtrack.ng', 'admin123', true);
+    window.TaxTrack.updateProfile({
+      firstName: 'Admin',
+      lastName: 'User',
+      employment: 'Administrator'
+    });
+    window.location.href = 'dashboard.html';
+  }
 </script>
 
 </body>
 </html>
-

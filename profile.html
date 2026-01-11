@@ -2,271 +2,440 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>User Profile | TaxTrack NG</title>
+  <title>Profile | TaxTrack NG</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Professional 2026 fintech-style user profile for TaxTrack NG.">
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+  <meta name="description" content="Manage your TaxTrack NG profile and account settings.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-
-    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
-    body { background: #f4f6fa; color: #111827; line-height: 1.6; }
-
-    a { text-decoration: none; color: inherit; }
-
-    header {
-      background: #111827;
-      color: #fff;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top:0;
-      z-index:100;
-    }
-    header .logo { font-size: 1.5rem; font-weight: 700; }
-    header .dropdown {
-      position: relative;
-    }
-    header .dropdown button {
-      background: #2563eb;
-      color: #fff;
-      padding: 0.5rem 1rem;
-      border-radius: 0.75rem;
-      border: none;
-      cursor: pointer;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap:0.5rem;
-    }
-    header .dropdown button:hover { background:#1d4ed8; }
-    header .dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 2.8rem;
-      background: #fff;
-      min-width: 200px;
-      border-radius: 0.75rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      overflow: hidden;
-      z-index: 100;
-    }
-    header .dropdown-content a {
-      display: block;
-      padding: 0.8rem 1rem;
-      color: #111827;
-      transition: 0.2s;
-    }
-    header .dropdown-content a:hover { background:#f1f5f9; }
-    header .dropdown.show .dropdown-content { display: block; }
-
-    /* ===== Main Container ===== */
-    main {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    .profile-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #fff;
-      border-radius: 1rem;
-      padding: 2rem;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-    }
-    .avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #2563eb;
-      margin-bottom: 1rem;
-    }
-    .profile-header h2 { font-size: 1.8rem; margin-bottom: 0.3rem; }
-    .profile-header p { color: #6b7280; margin-bottom: 0.5rem; }
-    .edit-btn {
-      background: #2563eb;
-      color: #fff;
-      padding: 0.6rem 1.2rem;
-      border-radius: 0.75rem;
-      font-weight: 500;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-      margin-top: 1rem;
-    }
-    .edit-btn:hover { background: #1d4ed8; }
-
-    .profile-section {
-      margin-top: 2rem;
-      background: #fff;
-      border-radius: 1rem;
-      padding: 1.8rem;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-    }
-    .profile-section h3 { font-size: 1.2rem; margin-bottom: 1rem; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; }
-    .profile-section p { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.95rem; }
-    .profile-section p span { font-weight: 500; }
-    .editable { cursor: pointer; padding:2px 4px; border-radius:4px; transition:0.2s; }
-    .editable:hover { background:#e5e7eb; }
-    .toggle-password { background:none; border:none; color:#2563eb; cursor:pointer; font-size:0.85rem; margin-left:0.5rem; }
-
-    @media(max-width:600px) {
-      .profile-header, .profile-section { padding: 1.5rem; }
-      .profile-header h2 { font-size:1.5rem; }
-      .avatar { width: 100px; height: 100px; }
-      header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-      header .dropdown { width:100%; }
-      header .dropdown button { width:100%; justify-content:space-between; }
-      header .dropdown-content { right:0; left:0; }
-    }
-  </style>
+  <link rel="stylesheet" href="profile.css">
 </head>
 <body>
 
-<header>
-  <div class="logo">TaxTrack NG</div>
-  <div class="dropdown" id="userDropdown">
-    <button onclick="toggleDropdown()"><i class="fa-solid fa-user"></i> Account <i class="fa-solid fa-caret-down"></i></button>
-    <div class="dropdown-content">
-      <a href="#personal">Personal Info</a>
-      <a href="#employment">Employment & Tax</a>
-      <a href="#security">Security Settings</a>
-      <a href="#download">Download Profile</a>
-      <a href="#" onclick="logout()">Logout</a>
-    </div>
+  <!-- Background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
   </div>
-</header>
 
-<main>
-
-  <section class="profile-header">
-    <img src="" alt="User Avatar" class="avatar" id="avatar">
-    <h2 id="name">Loading...</h2>
-    <p>Email: <span id="email"></span></p>
-    <p>Employment: <span id="employment"></span></p>
-    <button class="edit-btn" onclick="editProfile()"><i class="fa-solid fa-pen"></i> Edit Profile</button>
-  </section>
-
-  <section class="profile-section" id="personal">
-    <h3>Personal Information</h3>
-    <p>Full Name: <span class="editable" id="fullName"></span></p>
-    <p>Phone: <span class="editable" id="phone"></span></p>
-    <p>Date of Birth: <span class="editable" id="dob"></span></p>
-  </section>
-
-  <section class="profile-section" id="employment">
-    <h3>Employment & Tax Information</h3>
-    <p>Employment Type: <span class="editable" id="employmentType"></span></p>
-    <p>Company: <span class="editable" id="company"></span></p>
-    <p>Tax ID: <span class="editable" id="taxId"></span></p>
-  </section>
-
-  <section class="profile-section" id="security">
-    <h3>Security Settings</h3>
-    <p>Password: <span id="password">••••••••</span>
-      <button class="toggle-password" onclick="togglePassword()">Show</button>
-    </p>
-  </section>
-</main>
-
-<script>
- 
-  const profileData = {
-    avatar: 'avatar.png',
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    employment: 'Salary Earner',
-    fullName: 'John Doe',
-    phone: '+234 800 000 0000',
-    dob: '12 Dec 1990',
-    employmentType: 'Salary Earner',
-    company: 'ACME Ltd',
-    taxId: '123-45-6789',
-    password: 'password123'
-  };
-
-  function loadProfile() {
-    document.getElementById('avatar').src = profileData.avatar;
-    document.getElementById('name').textContent = profileData.name;
-    document.getElementById('email').textContent = profileData.email;
-    document.getElementById('employment').textContent = profileData.employment;
-    document.getElementById('fullName').textContent = profileData.fullName;
-    document.getElementById('phone').textContent = profileData.phone;
-    document.getElementById('dob').textContent = profileData.dob;
-    document.getElementById('employmentType').textContent = profileData.employmentType;
-    document.getElementById('company').textContent = profileData.company;
-    document.getElementById('taxId').textContent = profileData.taxId;
-    document.getElementById('password').dataset.password = profileData.password;
-  }
-
-
-  function enableInlineEdit() {
-    document.querySelectorAll('.editable').forEach(el => {
-      el.addEventListener('click', () => {
-        const current = el.textContent;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = current;
-        input.style.width = '100%';
-        el.replaceWith(input);
-        input.focus();
-        input.addEventListener('blur', () => {
-          el.textContent = input.value || current;
-          input.replaceWith(el);
-        });
-      });
-    });
-  }
-
-  function editProfile() {
-    alert('This would open an edit profile modal or navigate to edit page.');
-  }
-
-  function togglePassword() {
-    const pwdEl = document.getElementById('password');
-    const btn = pwdEl.nextElementSibling;
-    if(btn.textContent === 'Show'){
-      pwdEl.textContent = pwdEl.dataset.password;
-      btn.textContent = 'Hide';
-    } else {
-      pwdEl.textContent = '••••••••';
-      btn.textContent = 'Show';
-    }
-  }
-
-  function toggleDropdown() {
-    document.getElementById('userDropdown').classList.toggle('show');
-  }
-  window.onclick = function(event) {
-    if (!event.target.matches('.dropdown button')) {
-      const dropdowns = document.getElementsByClassName("dropdown");
-      Array.from(dropdowns).forEach(dd => dd.classList.remove('show'));
-    }
-  }
-
-  function logout() {
-    alert('Logging out...');
- 
-    window.location.href = 'login.html';
-  }
-
-  loadProfile();
-  enableInlineEdit();
-</script>
- <div style="text-align:center; margin:3rem 0;">
-    <a href="dashboard.html" class="edit-btn" style="background:#10b981;">
-      <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+  <!-- Header -->
+  <header class="header">
+    <a href="index.html" class="logo">
+      <div class="logo-icon"></div>
+      <span>TaxTrack NG</span>
     </a>
-  </div>
+    
+    <div class="header-actions">
+      <a href="dashboard.html" class="header-btn">
+        <i class="fas fa-chart-pie"></i>
+        Dashboard
+      </a>
+      <div class="dropdown" id="userDropdown">
+        <button class="dropdown-btn" onclick="toggleDropdown()">
+          <div class="avatar-small" id="headerAvatar">U</div>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-menu">
+          <a href="#personal"><i class="fas fa-user"></i> Personal Info</a>
+          <a href="#employment"><i class="fas fa-briefcase"></i> Employment</a>
+          <a href="#security"><i class="fas fa-shield-halved"></i> Security</a>
+          <div class="dropdown-divider"></div>
+          <a href="#" onclick="logout()" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Profile Header Card -->
+    <section class="profile-hero">
+      <div class="profile-avatar">
+        <span class="avatar-initials" id="avatarInitials">U</span>
+        <button class="avatar-edit" aria-label="Edit avatar" onclick="editAvatar()">
+          <i class="fas fa-camera"></i>
+        </button>
+      </div>
+      
+      <div class="profile-info">
+        <h1 id="profileName">Loading...</h1>
+        <p class="profile-email" id="profileEmail">Loading...</p>
+        <div class="profile-badges">
+          <span class="badge badge-primary">
+            <i class="fas fa-briefcase"></i>
+            <span id="employmentBadge">-</span>
+          </span>
+          <span class="badge badge-success">
+            <i class="fas fa-check-circle"></i>
+            Verified
+          </span>
+        </div>
+      </div>
+      
+      <button class="edit-profile-btn" onclick="toggleEditMode()">
+        <i class="fas fa-pen"></i>
+        <span id="editBtnText">Edit Profile</span>
+      </button>
+    </section>
+
+    <!-- Profile Sections -->
+    <div class="profile-grid">
+      <!-- Personal Information -->
+      <section class="profile-card" id="personal">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-user"></i></div>
+          <h2>Personal Information</h2>
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">First Name</span>
+            <span class="info-value editable" data-field="firstName" id="displayFirstName">-</span>
+            <input type="text" class="edit-input" data-field="firstName" id="editFirstName" style="display: none;">
+          </div>
+          <div class="info-item">
+            <span class="info-label">Last Name</span>
+            <span class="info-value editable" data-field="lastName" id="displayLastName">-</span>
+            <input type="text" class="edit-input" data-field="lastName" id="editLastName" style="display: none;">
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email Address</span>
+            <span class="info-value" id="displayEmail">-</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Phone Number</span>
+            <span class="info-value editable" data-field="phone" id="displayPhone">-</span>
+            <input type="tel" class="edit-input" data-field="phone" id="editPhone" style="display: none;">
+          </div>
+          <div class="info-item">
+            <span class="info-label">Date of Birth</span>
+            <span class="info-value editable" data-field="dob" id="displayDob">-</span>
+            <input type="date" class="edit-input" data-field="dob" id="editDob" style="display: none;">
+          </div>
+        </div>
+      </section>
+
+      <!-- Employment & Tax -->
+      <section class="profile-card" id="employment">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-briefcase"></i></div>
+          <h2>Employment & Tax</h2>
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Employment Type</span>
+            <span class="info-value editable" data-field="employment" id="displayEmployment">-</span>
+            <select class="edit-input" data-field="employment" id="editEmployment" style="display: none;">
+              <option value="Salary Earner">Salary Earner</option>
+              <option value="Freelancer">Freelancer</option>
+              <option value="Business Owner">Business Owner</option>
+              <option value="Contractor">Contractor</option>
+            </select>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Company / Employer</span>
+            <span class="info-value editable" data-field="company" id="displayCompany">-</span>
+            <input type="text" class="edit-input" data-field="company" id="editCompany" style="display: none;">
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tax Identification Number</span>
+            <span class="info-value" id="displayTaxId">
+              <span class="mono" id="taxIdValue">-</span>
+              <button class="copy-btn" onclick="copyToClipboard()" aria-label="Copy TIN">
+                <i class="fas fa-copy"></i>
+              </button>
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tax Office</span>
+            <span class="info-value editable" data-field="taxOffice" id="displayTaxOffice">-</span>
+            <input type="text" class="edit-input" data-field="taxOffice" id="editTaxOffice" style="display: none;">
+          </div>
+        </div>
+      </section>
+
+      <!-- Tax Summary -->
+      <section class="profile-card stats-card">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+          <h2>Tax Overview</h2>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value" id="statPaye">₦0</span>
+            <span class="stat-label">Total PAYE</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="statVat">₦0</span>
+            <span class="stat-label">Total VAT</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="statCount">0</span>
+            <span class="stat-label">Transactions</span>
+          </div>
+        </div>
+        
+        <a href="dashboard.html" class="view-dashboard-btn">
+          View Full Dashboard
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </section>
+
+      <!-- Security Settings -->
+      <section class="profile-card" id="security">
+        <div class="card-header">
+          <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
+          <h2>Security Settings</h2>
+        </div>
+        
+        <div class="security-item">
+          <div class="security-info">
+            <span class="security-label">Password</span>
+            <span class="security-value">••••••••</span>
+          </div>
+          <button class="secondary-btn" onclick="changePassword()">
+            <i class="fas fa-key"></i>
+            Change
+          </button>
+        </div>
+        
+        <div class="security-item">
+          <div class="security-info">
+            <span class="security-label">Two-Factor Authentication</span>
+            <span class="security-value status-disabled">Disabled</span>
+          </div>
+          <button class="secondary-btn" onclick="enable2FA()">
+            <i class="fas fa-lock"></i>
+            Enable
+          </button>
+        </div>
+        
+        <div class="security-item">
+          <div class="security-info">
+            <span class="security-label">Account Created</span>
+            <span class="security-value" id="accountCreated">-</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Save Button (shown in edit mode) -->
+    <div class="save-section" id="saveSection" style="display: none;">
+      <button class="primary-btn" onclick="saveProfile()">
+        <i class="fas fa-save"></i>
+        Save Changes
+      </button>
+      <button class="secondary-btn" onclick="cancelEdit()">
+        Cancel
+      </button>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="back-section">
+      <a href="dashboard.html" class="primary-btn">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2026 TaxTrack NG. All rights reserved.</p>
+  </footer>
+
+  <style>
+    .edit-input {
+      padding: 8px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: inherit;
+      width: 100%;
+      max-width: 250px;
+    }
+    .save-section {
+      text-align: center;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+  </style>
+
+  <script src="app.js"></script>
+  <script>
+    let isEditMode = false;
+    let originalData = {};
+
+    // Check auth on load
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!window.TaxTrack || !window.TaxTrack.isLoggedIn()) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      loadProfile();
+      loadTaxStats();
+    });
+
+    function loadProfile() {
+      const user = window.TaxTrack.getUser();
+      originalData = { ...user };
+      
+      // Avatar initials
+      const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+      document.getElementById('avatarInitials').textContent = initials.toUpperCase() || 'U';
+      document.getElementById('headerAvatar').textContent = initials.toUpperCase() || 'U';
+      
+      // Header info
+      const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User';
+      document.getElementById('profileName').textContent = fullName;
+      document.getElementById('profileEmail').textContent = user.email || 'No email set';
+      document.getElementById('employmentBadge').textContent = user.employment || 'Not specified';
+      
+      // Personal info
+      document.getElementById('displayFirstName').textContent = user.firstName || '-';
+      document.getElementById('displayLastName').textContent = user.lastName || '-';
+      document.getElementById('displayEmail').textContent = user.email || '-';
+      document.getElementById('displayPhone').textContent = user.phone || '-';
+      document.getElementById('displayDob').textContent = user.dob ? formatDate(user.dob) : '-';
+      
+      // Edit inputs
+      document.getElementById('editFirstName').value = user.firstName || '';
+      document.getElementById('editLastName').value = user.lastName || '';
+      document.getElementById('editPhone').value = user.phone || '';
+      document.getElementById('editDob').value = user.dob || '';
+      
+      // Employment info
+      document.getElementById('displayEmployment').textContent = user.employment || '-';
+      document.getElementById('displayCompany').textContent = user.company || '-';
+      document.getElementById('taxIdValue').textContent = user.taxId || 'Not assigned';
+      document.getElementById('displayTaxOffice').textContent = user.taxOffice || '-';
+      
+      // Edit inputs
+      document.getElementById('editEmployment').value = user.employment || 'Salary Earner';
+      document.getElementById('editCompany').value = user.company || '';
+      document.getElementById('editTaxOffice').value = user.taxOffice || '';
+      
+      // Account created
+      if (user.createdAt) {
+        document.getElementById('accountCreated').textContent = formatDate(user.createdAt);
+      }
+    }
+
+    function loadTaxStats() {
+      const summary = window.TaxTrack.getTaxSummary();
+      document.getElementById('statPaye').textContent = `₦${summary.paye.toLocaleString()}`;
+      document.getElementById('statVat').textContent = `₦${summary.vat.toLocaleString()}`;
+      document.getElementById('statCount').textContent = summary.count;
+    }
+
+    function toggleEditMode() {
+      isEditMode = !isEditMode;
+      
+      const editables = document.querySelectorAll('.info-value.editable');
+      const inputs = document.querySelectorAll('.edit-input');
+      const saveSection = document.getElementById('saveSection');
+      const editBtnText = document.getElementById('editBtnText');
+      
+      if (isEditMode) {
+        editables.forEach(el => el.style.display = 'none');
+        inputs.forEach(el => el.style.display = 'block');
+        saveSection.style.display = 'flex';
+        editBtnText.textContent = 'Cancel';
+      } else {
+        editables.forEach(el => el.style.display = 'inline');
+        inputs.forEach(el => el.style.display = 'none');
+        saveSection.style.display = 'none';
+        editBtnText.textContent = 'Edit Profile';
+      }
+    }
+
+    function cancelEdit() {
+      // Reset inputs to original values
+      document.getElementById('editFirstName').value = originalData.firstName || '';
+      document.getElementById('editLastName').value = originalData.lastName || '';
+      document.getElementById('editPhone').value = originalData.phone || '';
+      document.getElementById('editDob').value = originalData.dob || '';
+      document.getElementById('editEmployment').value = originalData.employment || 'Salary Earner';
+      document.getElementById('editCompany').value = originalData.company || '';
+      document.getElementById('editTaxOffice').value = originalData.taxOffice || '';
+      
+      toggleEditMode();
+    }
+
+    function saveProfile() {
+      const updates = {
+        firstName: document.getElementById('editFirstName').value.trim(),
+        lastName: document.getElementById('editLastName').value.trim(),
+        phone: document.getElementById('editPhone').value.trim(),
+        dob: document.getElementById('editDob').value,
+        employment: document.getElementById('editEmployment').value,
+        company: document.getElementById('editCompany').value.trim(),
+        taxOffice: document.getElementById('editTaxOffice').value.trim()
+      };
+      
+      window.TaxTrack.updateProfile(updates);
+      
+      // Reload profile display
+      loadProfile();
+      
+      // Exit edit mode
+      toggleEditMode();
+      
+      window.TaxTrack.showToast('Profile updated successfully!', 'success');
+    }
+
+    function editAvatar() {
+      window.TaxTrack.showToast('Avatar upload coming soon!', 'info');
+    }
+
+    function copyToClipboard() {
+      const taxId = document.getElementById('taxIdValue').textContent;
+      navigator.clipboard.writeText(taxId).then(() => {
+        window.TaxTrack.showToast('Tax ID copied to clipboard!', 'success');
+      });
+    }
+
+    function changePassword() {
+      window.TaxTrack.showToast('Password change feature coming soon!', 'info');
+    }
+
+    function enable2FA() {
+      window.TaxTrack.showToast('2FA setup coming soon!', 'info');
+    }
+
+    function toggleDropdown() {
+      document.getElementById('userDropdown').classList.toggle('show');
+    }
+
+    window.onclick = function(event) {
+      if (!event.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('show'));
+      }
+    };
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.TaxTrack.logout();
+      }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-NG', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+  </script>
 </body>
 </html>
-

@@ -1,129 +1,255 @@
-* {
+/* ========================================
+   TaxTrack NG - Edit Profile Styles
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Core palette */
+  --primary: #0a1628;
+  --primary-light: #132238;
+  --accent: #00d4aa;
+  --accent-glow: rgba(0, 212, 170, 0.3);
+  
+  /* Gradients */
+  --gradient-hero: linear-gradient(135deg, #0a1628 0%, #1a2d47 50%, #0d3251 100%);
+  --gradient-accent: linear-gradient(135deg, #00d4aa 0%, #00b894 50%, #00cec9 100%);
+  
+  /* Glass effect */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(20px);
+  
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  /* UI Colors */
+  --card-bg: rgba(19, 34, 56, 0.6);
+  --border: rgba(255, 255, 255, 0.06);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --danger: #ff6b6b;
+  --success: #00d4aa;
+  
+  /* Shadows */
+  --shadow-glow: 0 0 40px rgba(0, 212, 170, 0.2);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+  
+  /* Typography */
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Spacing */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  
+  /* Animations */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+}
+
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  display: flex;
+  font-family: var(--font-main);
+  background: var(--gradient-hero);
+  color: var(--text-primary);
+  line-height: 1.6;
   min-height: 100vh;
-  background-color: #f4f6f8;
-  color: #333;
+  display: flex;
+  -webkit-font-smoothing: antialiased;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ========================================
+   Sidebar
+   ======================================== */
+
 .sidebar {
-  width: 220px;
-  background-color: #1e293b;
-  color: #fff;
+  width: 260px;
+  background: rgba(10, 22, 40, 0.95);
+  border-right: 1px solid var(--glass-border);
+  padding: 28px 20px;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  backdrop-filter: var(--glass-blur);
 }
 
 .sidebar .logo a {
-  color: #fff;
-  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 30px;
-  display: inline-block;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 40px;
+}
+
+.sidebar .logo a::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 36px;
+  background: var(--gradient-accent);
+  border-radius: 8px;
+  box-shadow: var(--shadow-glow);
 }
 
 .sidebar nav ul {
   list-style: none;
-  padding: 0;
-}
-
-.sidebar nav ul li {
-  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .sidebar nav ul li a {
-  text-decoration: none;
-  color: #cbd5e1;
-  padding: 10px 12px;
-  display: block;
-  border-radius: 5px;
-  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: var(--transition-base);
 }
 
 .sidebar nav ul li a:hover,
 .sidebar nav ul li.active a {
-  background-color: #3b82f6;
-  color: #fff;
+  background: rgba(0, 212, 170, 0.12);
+  color: var(--accent);
 }
+
+/* ========================================
+   Content Area
+   ======================================== */
 
 .content {
   flex: 1;
-  padding: 40px;
+  padding: 48px;
+  max-width: 800px;
 }
 
 .content h1 {
-  margin-bottom: 30px;
-  color: #1e293b;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 32px;
+  color: var(--text-primary);
 }
 
+/* ========================================
+   Edit Profile Form
+   ======================================== */
+
 .edit-profile-form {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  backdrop-filter: var(--glass-blur);
 }
 
 .edit-profile-form fieldset {
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 25px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 28px;
 }
 
 .edit-profile-form legend {
-  font-weight: bold;
-  padding: 0 10px;
-  color: #1e293b;
+  font-weight: 600;
+  padding: 0 12px;
+  color: var(--accent);
+  font-size: 1rem;
 }
 
 .edit-profile-form label {
   display: block;
-  margin-bottom: 6px;
-  margin-top: 12px;
+  margin-bottom: 8px;
+  margin-top: 16px;
   font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.edit-profile-form label:first-of-type {
+  margin-top: 0;
 }
 
 .edit-profile-form input,
 .edit-profile-form select {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  margin-bottom: 8px;
+  padding: 14px 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   font-size: 1rem;
-  transition: border 0.3s;
+  color: var(--text-primary);
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition-base);
+}
+
+.edit-profile-form input::placeholder {
+  color: var(--text-muted);
 }
 
 .edit-profile-form input:focus,
 .edit-profile-form select:focus {
-  border-color: #3b82f6;
-  outline: none;
+  border-color: var(--accent);
+  background: rgba(0, 212, 170, 0.05);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.edit-profile-form select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+.edit-profile-form select option {
+  background: var(--primary);
+  color: var(--text-primary);
 }
 
 .edit-profile-form button {
-  background-color: #3b82f6;
-  color: #fff;
-  font-weight: bold;
-  padding: 12px 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: var(--gradient-accent);
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: var(--radius-md);
   font-size: 1rem;
-  transition: background-color 0.3s;
-  margin-top: 10px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition: var(--transition-base);
+  box-shadow: var(--shadow-glow);
+  margin-top: 16px;
 }
 
 .edit-profile-form button:hover {
-  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 0 50px rgba(0, 212, 170, 0.4);
 }
+
+/* ========================================
+   Responsive
+   ======================================== */
 
 @media (max-width: 900px) {
   body {
@@ -133,29 +259,44 @@ body {
   .sidebar {
     width: 100%;
     flex-direction: row;
-    justify-content: space-around;
-    padding: 15px 10px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+  }
+
+  .sidebar .logo a {
+    margin-bottom: 0;
   }
 
   .sidebar nav ul {
-    display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
+  }
+  
+  .sidebar nav ul li a {
+    padding: 10px 16px;
   }
 
   .content {
-    padding: 20px;
+    padding: 32px 20px;
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
+  .sidebar nav ul li a span {
+    display: none;
+  }
+  
   .edit-profile-form {
-    padding: 20px;
+    padding: 28px 24px;
   }
 
-  .edit-profile-form input,
-  .edit-profile-form select {
-    font-size: 0.95rem;
+  .edit-profile-form fieldset {
+    padding: 20px 16px;
+  }
+
+  .content h1 {
+    font-size: 1.6rem;
   }
 }
 

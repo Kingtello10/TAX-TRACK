@@ -1,286 +1,830 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>TaxTrack NG | Live Tax Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-* { box-sizing: border-box; margin:0; padding:0; }
-body { font-family:"Inter",sans-serif; background:#f6f8fb; color:#1f2937; line-height:1.6; }
-a { text-decoration:none; color:inherit; }
-button { cursor:pointer; }
-
-.layout { display:flex; min-height:100vh; }
-.sidebar { width:250px; background:#1ea672; color:#e5e7eb; padding:30px 20px; position:sticky; top:0; height:100vh; }
-.logo { font-size:1.3rem; font-weight:700; margin-bottom:40px; display:flex; align-items:center; gap:10px; }
-.menu { list-style:none; display:flex; flex-direction:column; gap:14px; }
-.menu a { padding:10px 14px; border-radius:8px; display:flex; align-items:center; gap:10px; color:#cbd5f5; font-size:0.95rem; }
-.menu a:hover, .menu a.active { background:#16a085; color:#fff; }
-.main-content { flex:1; display:flex; flex-direction:column; }
-.topbar { background:#fff; border-bottom:1px solid #e5e7eb; padding:20px 32px; display:flex; justify-content:space-between; align-items:center; }
-.topbar h1 { font-size:1.4rem; font-weight:600; }
-
-.page { padding:40px 32px; max-width:1200px; width:100%; }
-.page.hidden { display:none; }
-.page h2 { font-size:1.6rem; margin-bottom:10px; }
-.page p { margin-bottom:20px; color:#4b5563; }
-
-.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; background:#fff; padding:24px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
-label { display:flex; flex-direction:column; font-size:0.9rem; gap:6px; }
-input, select, textarea { padding:10px 12px; border-radius:8px; border:1px solid #d1d5db; font-size:0.95rem; }
-textarea { min-height:120px; resize:vertical; }
-.primary-btn { background:#1ea672; color:#fff; border:none; border-radius:10px; padding:12px 16px; font-size:0.95rem; }
-.primary-btn:hover { background:#16a085; }
-.full-width { grid-column:1/-1; }
-
-.dashboard-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-bottom:32px; }
-.card { background:#fff; padding:24px; border-radius:14px; box-shadow:0 4px 12px rgba(0,0,0,0.05); text-align:center; }
-.card h3 { font-size:1rem; margin-bottom:8px; }
-.card p { font-size:1.6rem; font-weight:600; }
-
-table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; }
-th, td { padding:14px 16px; border-bottom:1px solid #e5e7eb; font-size:0.9rem; text-align:left; }
-th { background:#f9fafb; }
-
-footer { background:#1ea672; color:#cbd5f5; padding:32px; text-align:center; width:100%; }
-footer .social-icons { margin-top:10px; display:flex; justify-content:center; gap:16px; }
-footer a { color:#cbd5f5; font-size:1.1rem; }
-footer a:hover { color:#fff; }
-
-@media(max-width:768px) { .layout { flex-direction:column; } .sidebar { width:100%; height:auto; position:relative; } .main-content { flex:unset; }
-}
-</style>
-
-<script>
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('active'));
-  document.querySelector(`[data-page="${id}"]`).classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-// ===== GLOBAL DATA =====
-let taxData = {
-  paye:0,
-  vat:0,
-  consumption:0,
-  transactions:[]
-};
-
-// ===== CALCULATORS =====
-function calculatePAYE(){
-  const gross=Number(document.getElementById('gross').value||0);
-  const pension=Number(document.getElementById('pension').value||0);
-  const nhf=Number(document.getElementById('nhf').value||0);
-  const other=Number(document.getElementById('otherReliefs').value||0);
-  const reliefs = pension+nhf+other+200000;
-  const taxable = Math.max(gross - reliefs,0);
-  const tax = taxable*0.15;
-  addTransaction(new Date().toISOString().split('T')[0],'PAYE',tax,'Salary Tax Calculation');
-  document.getElementById('payeResult').innerText=`Estimated PAYE: ₦${tax.toLocaleString()}`;
-}
-
-function calculateVAT(){
-  const amount=Number(document.getElementById('vatAmount').value||0);
-  const vat = amount*0.075;
-  addTransaction(new Date().toISOString().split('T')[0],'VAT',vat,'VAT Calculation');
-  document.getElementById('vatResult').innerText=`VAT (7.5%): ₦${vat.toLocaleString()}`;
-}
-
-// ===== TRANSACTION MANAGEMENT =====
-function addTransaction(date,type,amount,details){
-  taxData.transactions.push({date,type,amount,details});
-  renderTransactions();
-  updateSummary();
-}
-
-// ===== RENDER TRANSACTIONS =====
-function renderTransactions(){
-  const tbody = document.getElementById('historyBody');
-  tbody.innerHTML='';
-  taxData.transactions.forEach(tx=>{
-    const row=document.createElement('tr');
-    row.innerHTML=`<td>${tx.date}</td><td>${tx.type}</td><td>₦${tx.amount.toLocaleString()}</td><td>${tx.details}</td>`;
-    tbody.appendChild(row);
-  });
-}
-
-// ===== SUMMARY & CHART =====
-let chart;
-function updateSummary(){
-  const totalPAYE = taxData.transactions.filter(t=>t.type==='PAYE').reduce((sum,t)=>sum+t.amount,0);
-  const totalVAT = taxData.transactions.filter(t=>t.type==='VAT').reduce((sum,t)=>sum+t.amount,0);
-  const totalConsumption = taxData.transactions.filter(t=>t.type==='Consumption').reduce((sum,t)=>sum+t.amount,0);
-
-  taxData.paye = totalPAYE;
-  taxData.vat = totalVAT;
-  taxData.consumption = totalConsumption;
-
-  document.getElementById('cardIncome').innerText=`₦${totalPAYE.toLocaleString()}`;
-  document.getElementById('cardVAT').innerText=`₦${totalVAT.toLocaleString()}`;
-  document.getElementById('cardConsumption').innerText=`₦${totalConsumption.toLocaleString()}`;
-
-  if(chart){
-    chart.data.datasets[0].data=[totalPAYE,totalVAT,totalConsumption];
-    chart.update();
-  }
-}
-
-// ===== EXPORT CSV =====
-function exportCSV(){
-  let csv='Date,Type,Amount,Details\n';
-  taxData.transactions.forEach(tx=>{
-    csv+=`${tx.date},${tx.type},${tx.amount},${tx.details}\n`;
-  });
-  const blob=new Blob([csv],{type:'text/csv'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='tax_history.csv'; a.click();
-  URL.revokeObjectURL(url);
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  const ctx = document.getElementById('taxChart').getContext('2d');
-  chart = new Chart(ctx,{type:'pie',data:{labels:['Income Tax','VAT','Consumption'],datasets:[{data:[0,0,0], backgroundColor:['#1ea672','#16a085','#10b981']}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
-});
-</script>
+  <meta charset="UTF-8">
+  <title>Dashboard | TaxTrack NG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Track and manage your Nigerian taxes with TaxTrack NG dashboard.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
+
 <div class="layout">
+  <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo"><i class="fas fa-coins"></i> TaxTrack NG</div>
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-coins"></i></div>
+      <span class="logo-text">TaxTrack NG</span>
+    </div>
+    
     <ul class="menu">
-      <li><a href="#" data-page="salary" onclick="showPage('salary')"><i class="fas fa-money-check-dollar"></i> Salary Tax</a></li>
-      <li><a href="#" data-page="vat" onclick="showPage('vat')"><i class="fas fa-receipt"></i> VAT & Consumption</a></li>
-      <li><a href="#" data-page="summary" onclick="showPage('summary')"><i class="fas fa-chart-pie"></i> Tax Summary</a></li>
-      <li><a href="#" data-page="history" onclick="showPage('history')"><i class="fas fa-history"></i> Tax History</a></li>
-      <li><a href="#" data-page="profile" onclick="showPage('profile')"><i class="fas fa-user-circle"></i> Profile</a></li>
-      <li><a href="#" data-page="settings" onclick="showPage('settings')"><i class="fas fa-cogs"></i> Settings</a></li>
+      <li><a href="#" data-page="salary" onclick="showPage('salary')" class="active">
+        <i class="fas fa-money-check-dollar"></i> Salary Tax
+      </a></li>
+      <li><a href="#" data-page="vat" onclick="showPage('vat')">
+        <i class="fas fa-receipt"></i> VAT & Consumption
+      </a></li>
+      <li><a href="#" data-page="summary" onclick="showPage('summary')">
+        <i class="fas fa-chart-pie"></i> Tax Summary
+      </a></li>
+      <li><a href="#" data-page="history" onclick="showPage('history')">
+        <i class="fas fa-history"></i> Tax History
+      </a></li>
+      <li><a href="#" data-page="profile" onclick="showPage('profile')">
+        <i class="fas fa-user-circle"></i> Profile
+      </a></li>
+      <li><a href="#" data-page="settings" onclick="showPage('settings')">
+        <i class="fas fa-cog"></i> Settings
+      </a></li>
     </ul>
+    
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="sidebarAvatar">JD</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">User</div>
+          <div class="user-role" id="sidebarRole">Tax Tracker</div>
+        </div>
+      </div>
+    </div>
   </aside>
 
+  <!-- Main Content -->
   <div class="main-content">
+    <!-- Topbar -->
     <header class="topbar">
-      <h1>TaxTrack NG Dashboard</h1>
-      <div class="user-menu"><i class="fas fa-user-circle"></i> User</div>
+      <h1>Tax Dashboard</h1>
+      <div class="topbar-actions">
+        <button class="topbar-btn" aria-label="Notifications" onclick="showNotifications()">
+          <i class="fas fa-bell"></i>
+          <span class="badge" id="notifBadge"></span>
+        </button>
+        <div class="user-menu" id="userMenu">
+          <i class="fas fa-user-circle"></i>
+          <span id="topbarName">Account</span>
+          <div class="user-dropdown" id="userDropdown">
+            <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+            <a href="#" onclick="showPage('settings')"><i class="fas fa-cog"></i> Settings</a>
+            <div class="dropdown-divider"></div>
+            <a href="#" onclick="handleLogout()" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </div>
     </header>
 
-    <!-- SALARY PAGE -->
+    <!-- SALARY TAX PAGE -->
     <section id="salary" class="page">
-      <h2>Salary Tax Calculator</h2>
-      <p>Estimate your PAYE based on your salary and reliefs.</p>
-      <form class="form-grid" onsubmit="event.preventDefault(); calculatePAYE();">
-        <label>Gross Salary (₦)<input id="gross" type="number" required></label>
-        <label>Pension (₦)<input id="pension" type="number"></label>
-        <label>NHF (₦)<input id="nhf" type="number"></label>
-        <label>Other Reliefs (₦)<input id="otherReliefs" type="number"></label>
-        <button class="primary-btn full-width">Calculate PAYE</button>
-        <div id="payeResult" style="grid-column:1/-1;font-weight:600;"></div>
-      </form>
-    </section>
-
-    <!-- VAT & Consumption PAGE -->
-<section id="vat" class="page hidden">
-  <h2>VAT & Consumption Tax</h2>
-  <p>Import receipts, CSVs, or enter transactions manually. All transactions will be analyzed automatically.</p>
-
-  <div class="form-grid">
-
-    <!-- File Import: CSV or Receipts -->
-    <label>
-      Import CSV / Receipt Images
-      <input type="file" id="vatFileInput" accept=".csv,image/*" multiple data-type="vatInput">
-      <small>Select CSV files or images. They will be analyzed automatically.</small>
-    </label>
-
-    <!-- Manual Transaction Input -->
-    <label>Total Expenses (₦)
-      <input type="number" id="vatAmountManual" placeholder="Enter expense amount manually">
-    </label>
-    <label>Transaction Details
-      <input type="text" id="vatDetailsManual" placeholder="E.g., Office supplies">
-    </label>
-    <label>Type
-      <select id="vatTypeManual">
-        <option value="VAT">VAT</option>
-        <option value="Consumption">Consumption</option>
-      </select>
-    </label>
-    <button class="primary-btn full-width" id="addManualTransactionBtn">Add Transaction</button>
-
-    <div id="vatResult" style="grid-column:1/-1; font-weight:600;"></div>
-  </div>
-</section>
-
-    <!-- SUMMARY PAGE -->
-    <section id="summary" class="page hidden">
-      <h2>Tax Summary</h2>
-      <div class="dashboard-cards">
-        <div class="card"><h3>Income Tax</h3><p id="cardIncome">₦0</p></div>
-        <div class="card"><h3>VAT</h3><p id="cardVAT">₦0</p></div>
-        <div class="card"><h3>Consumption</h3><p id="cardConsumption">₦0</p></div>
+      <div class="page-header">
+        <h2>Salary Tax Calculator</h2>
+        <p>Estimate your PAYE based on your salary and applicable reliefs.</p>
       </div>
-      <canvas id="taxChart" height="200"></canvas>
+      
+      <form class="form-grid" id="payeForm">
+        <label>
+          Gross Annual Salary (₦)
+          <input type="number" id="gross" placeholder="e.g. 5,000,000" required>
+        </label>
+        <label>
+          Pension Contribution (₦)
+          <input type="number" id="pension" placeholder="Optional" value="0">
+        </label>
+        <label>
+          NHF Contribution (₦)
+          <input type="number" id="nhf" placeholder="Optional" value="0">
+        </label>
+        <label>
+          Other Reliefs (₦)
+          <input type="number" id="otherReliefs" placeholder="Optional" value="0">
+        </label>
+        <button type="submit" class="primary-btn full-width">
+          <i class="fas fa-calculator"></i>
+          Calculate PAYE
+        </button>
+        <div id="payeResult" class="result-display" style="display: none;"></div>
+      </form>
     </section>
 
-    <!-- HISTORY PAGE -->
+    <!-- VAT & CONSUMPTION PAGE -->
+    <section id="vat" class="page hidden">
+      <div class="page-header">
+        <h2>VAT & Consumption Tax</h2>
+        <p>Import receipts, CSVs, or enter transactions manually. All transactions are saved automatically.</p>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          Import CSV / Receipt Images
+          <input type="file" id="vatFileInput" accept=".csv,image/*" multiple>
+          <small style="color: var(--text-muted); margin-top: 4px;">Upload CSV files or receipt images for automatic analysis</small>
+        </label>
+
+        <label>
+          Total Expense Amount (₦)
+          <input type="number" id="vatAmountManual" placeholder="Enter expense amount">
+        </label>
+        
+        <label>
+          Transaction Details
+          <input type="text" id="vatDetailsManual" placeholder="e.g., Office supplies, Groceries">
+        </label>
+        
+        <label>
+          Tax Type
+          <select id="vatTypeManual">
+            <option value="VAT">VAT (7.5%)</option>
+            <option value="Consumption">Consumption Tax</option>
+          </select>
+        </label>
+        
+        <button type="button" class="primary-btn full-width" id="addManualTransactionBtn">
+          <i class="fas fa-plus"></i>
+          Add Transaction
+        </button>
+
+        <div id="ocrPreview"></div>
+        <button type="button" class="secondary-btn full-width" id="confirmOCR" style="display: none;">
+          <i class="fas fa-check"></i>
+          Confirm Selected Transactions
+        </button>
+        
+        <div id="vatResult" class="result-display" style="display: none;"></div>
+      </div>
+    </section>
+
+    <!-- TAX SUMMARY PAGE -->
+    <section id="summary" class="page hidden">
+      <div class="page-header">
+        <h2>Tax Summary</h2>
+        <p>Overview of all your tracked taxes this period.</p>
+      </div>
+      
+      <div class="dashboard-cards">
+        <div class="card">
+          <div class="card-icon"><i class="fas fa-building-columns"></i></div>
+          <h3>Income Tax (PAYE)</h3>
+          <p id="cardIncome">₦0</p>
+          <span class="change"><i class="fas fa-arrow-up"></i> This month</span>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fas fa-receipt"></i></div>
+          <h3>Value Added Tax</h3>
+          <p id="cardVAT">₦0</p>
+          <span class="change"><i class="fas fa-arrow-up"></i> This month</span>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fas fa-shopping-cart"></i></div>
+          <h3>Consumption Tax</h3>
+          <p id="cardConsumption">₦0</p>
+          <span class="change"><i class="fas fa-arrow-up"></i> This month</span>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fas fa-calculator"></i></div>
+          <h3>Total Tracked</h3>
+          <p id="cardTotal">₦0</p>
+          <span class="change"><i class="fas fa-chart-line"></i> All time</span>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="taxChart"></canvas>
+      </div>
+    </section>
+
+    <!-- TAX HISTORY PAGE -->
     <section id="history" class="page hidden">
-      <h2>Tax History</h2>
-      <table>
-        <thead>
-          <tr><th>Date</th><th>Type</th><th>Amount (₦)</th><th>Details</th></tr>
-        </thead>
-        <tbody id="historyBody"></tbody>
-      </table>
-      <form class="form-grid" onsubmit="event.preventDefault(); addTransaction(new Date().toISOString().split('T')[0], document.getElementById('txType').value, Number(document.getElementById('txAmount').value), document.getElementById('txDetails').value);">
-        <label>Type<select id="txType"><option>PAYE</option><option>VAT</option><option>Consumption</option></select></label>
-        <label>Amount (₦)<input type="number" id="txAmount" required></label>
-        <label>Details<input type="text" id="txDetails" required></label>
-        <button class="primary-btn full-width">Add Transaction</button>
-      </form>
-      <button class="primary-btn" onclick="exportCSV()">Export CSV</button>
+      <div class="page-header">
+        <h2>Tax History</h2>
+        <p>View and manage all your tax transactions.</p>
+      </div>
+      
+      <div class="table-wrapper mb-4">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Amount (₦)</th>
+              <th>Details</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 12px; display: block;"></i>
+                No transactions yet. Start by adding a tax calculation.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="form-grid">
+        <label>
+          Transaction Type
+          <select id="txType">
+            <option value="PAYE">PAYE</option>
+            <option value="VAT">VAT</option>
+            <option value="Consumption">Consumption</option>
+          </select>
+        </label>
+        <label>
+          Amount (₦)
+          <input type="number" id="txAmount" placeholder="Enter amount" required>
+        </label>
+        <label>
+          Details
+          <input type="text" id="txDetails" placeholder="Transaction description">
+        </label>
+        <button type="button" class="primary-btn" onclick="addManualTx()">
+          <i class="fas fa-plus"></i> Add Transaction
+        </button>
+        <button type="button" class="secondary-btn" onclick="exportTransactions()">
+          <i class="fas fa-download"></i> Export CSV
+        </button>
+        <button type="button" class="secondary-btn" onclick="clearAllTransactions()" style="border-color: var(--danger); color: var(--danger);">
+          <i class="fas fa-trash"></i> Clear All
+        </button>
+      </div>
     </section>
 
     <!-- PROFILE PAGE -->
     <section id="profile" class="page hidden">
-      <h2>User Profile</h2>
-      <form class="form-grid">
-        <label>Full Name<input type="text" value="John Doe"></label>
-        <label>Email<input type="email" value="john@example.com"></label>
-        <label>Phone<input type="tel" value="+2348012345678"></label>
-        <label>Date of Birth<input type="date" value="1990-01-01"></label>
-        <label>Password<input type="password" value="password"></label>
-        <button class="primary-btn full-width">Update Profile</button>
+      <div class="page-header">
+        <h2>Your Profile</h2>
+        <p>Manage your personal information and account settings.</p>
+      </div>
+      
+      <form class="form-grid" id="profileForm">
+        <label>
+          First Name
+          <input type="text" id="profileFirstName" required>
+        </label>
+        <label>
+          Last Name
+          <input type="text" id="profileLastName" required>
+        </label>
+        <label>
+          Email Address
+          <input type="email" id="profileEmail" required>
+        </label>
+        <label>
+          Phone Number
+          <input type="tel" id="profilePhone">
+        </label>
+        <label>
+          Date of Birth
+          <input type="date" id="profileDob">
+        </label>
+        <label>
+          Employment Type
+          <select id="profileEmployment">
+            <option value="Salary Earner">Salary Earner</option>
+            <option value="Freelancer">Freelancer</option>
+            <option value="Business Owner">Business Owner</option>
+            <option value="Contractor">Contractor</option>
+          </select>
+        </label>
+        <label>
+          Company / Employer
+          <input type="text" id="profileCompany">
+        </label>
+        <label>
+          Tax ID (TIN)
+          <input type="text" id="profileTaxId" readonly style="cursor: not-allowed; opacity: 0.7;">
+        </label>
+        <button type="submit" class="primary-btn full-width">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
       </form>
     </section>
 
     <!-- SETTINGS PAGE -->
     <section id="settings" class="page hidden">
-      <h2>Settings</h2>
-      <form class="form-grid">
-        <label>Currency<select><option>NGN</option><option>USD</option></select></label>
-        <label>Financial Year Start<input type="month"></label>
-        <label>Enable Notifications<select><option>Yes</option><option>No</option></select></label>
-        <button class="primary-btn full-width">Save Settings</button>
+      <div class="page-header">
+        <h2>Settings</h2>
+        <p>Customize your TaxTrack experience.</p>
+      </div>
+      
+      <form class="form-grid" id="settingsForm">
+        <label>
+          Currency
+          <select id="settingsCurrency">
+            <option value="NGN">Nigerian Naira (₦)</option>
+            <option value="USD">US Dollar ($)</option>
+          </select>
+        </label>
+        <label>
+          Financial Year Start Month
+          <select id="settingsYearStart">
+            <option value="01">January</option>
+            <option value="04">April</option>
+            <option value="07">July</option>
+            <option value="10">October</option>
+          </select>
+        </label>
+        <label>
+          Email Notifications
+          <select id="settingsNotifications">
+            <option value="true">Enabled</option>
+            <option value="false">Disabled</option>
+          </select>
+        </label>
+        <label>
+          Weekly Tax Reports
+          <select id="settingsReports">
+            <option value="true">Enabled</option>
+            <option value="false">Disabled</option>
+          </select>
+        </label>
+        <button type="submit" class="primary-btn full-width">
+          <i class="fas fa-save"></i> Save Settings
+        </button>
+        
+        <div class="full-width" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+          <h3 style="margin-bottom: 16px; color: var(--text-primary);">Danger Zone</h3>
+          <button type="button" class="secondary-btn" onclick="handleLogout()" style="margin-right: 12px;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+          <button type="button" class="secondary-btn" onclick="deleteAccount()" style="border-color: var(--danger); color: var(--danger);">
+            <i class="fas fa-trash"></i> Delete Account
+          </button>
+        </div>
       </form>
     </section>
 
+    <!-- Footer -->
     <footer>
       <p>© 2026 TaxTrack NG — Built for Nigerian employees, freelancers & SMEs</p>
       <div class="social-icons">
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-linkedin"></i></a>
-        <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
       </div>
     </footer>
   </div>
 </div>
+
+<style>
+  /* User dropdown */
+  .user-menu {
+    position: relative;
+    cursor: pointer;
+  }
+  .user-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 200px;
+    background: var(--primary-light);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    display: none;
+    z-index: 100;
+  }
+  .user-menu.show .user-dropdown {
+    display: block;
+    animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .user-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    transition: var(--transition-fast);
+  }
+  .user-dropdown a:hover {
+    background: rgba(0, 212, 170, 0.1);
+    color: var(--accent);
+  }
+  .dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+  .logout-link:hover {
+    color: var(--danger) !important;
+    background: rgba(255, 107, 107, 0.1) !important;
+  }
+  
+  /* Delete button in table */
+  .delete-btn {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+  .delete-btn:hover {
+    background: var(--danger);
+    color: #fff;
+  }
+</style>
+
+<script src="app.js"></script>
+<script>
+// ===== AUTH CHECK =====
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if logged in
+  if (!window.TaxTrack || !window.TaxTrack.isLoggedIn()) {
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  // Initialize dashboard
+  initDashboard();
+});
+
+let chart = null;
+
+function initDashboard() {
+  // Load user info
+  loadUserInfo();
+  
+  // Load transactions from storage
+  renderTransactions();
+  updateSummary();
+  
+  // Load profile data
+  loadProfileData();
+  
+  // Load settings
+  loadSettingsData();
+  
+  // Initialize chart
+  initChart();
+  
+  // Setup event listeners
+  setupEventListeners();
+  
+  // Show first page
+  showPage('salary');
+}
+
+// ===== USER INFO =====
+function loadUserInfo() {
+  const user = window.TaxTrack.getUser();
+  
+  // Sidebar
+  const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+  document.getElementById('sidebarAvatar').textContent = initials.toUpperCase() || 'U';
+  document.getElementById('sidebarName').textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User';
+  document.getElementById('sidebarRole').textContent = user.employment || 'Tax Tracker';
+  
+  // Topbar
+  document.getElementById('topbarName').textContent = user.firstName || 'Account';
+}
+
+// ===== PAGE NAVIGATION =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
+  const activeLink = document.querySelector(`[data-page="${id}"]`);
+  if (activeLink) activeLink.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // Update chart when summary is shown
+  if (id === 'summary' && chart) {
+    updateSummary();
+  }
+}
+
+// ===== PAYE CALCULATOR =====
+document.getElementById('payeForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const gross = Number(document.getElementById('gross').value || 0);
+  const reliefs = {
+    pension: document.getElementById('pension').value,
+    nhf: document.getElementById('nhf').value,
+    other: document.getElementById('otherReliefs').value
+  };
+  
+  const result = window.TaxTrack.calculatePAYE(gross, reliefs);
+  
+  // Add transaction
+  window.TaxTrack.addTransaction({
+    type: 'PAYE',
+    amount: result.annualTax,
+    details: `Salary Tax (Gross: ₦${gross.toLocaleString()})`
+  });
+  
+  // Show result
+  const resultEl = document.getElementById('payeResult');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `
+    <div style="text-align: left;">
+      <div style="margin-bottom: 12px;"><i class="fas fa-check-circle"></i> PAYE Calculated & Saved</div>
+      <div style="display: grid; gap: 8px; font-size: 0.95rem;">
+        <div>Annual Tax: <strong>₦${result.annualTax.toLocaleString()}</strong></div>
+        <div>Monthly Tax: <strong>₦${result.monthlyTax.toLocaleString()}</strong></div>
+        <div style="color: var(--text-muted);">Taxable Income: ₦${result.taxableIncome.toLocaleString()}</div>
+      </div>
+    </div>
+  `;
+  
+  // Update UI
+  renderTransactions();
+  updateSummary();
+  
+  window.TaxTrack.showToast('PAYE calculated and saved!', 'success');
+});
+
+// ===== VAT TRANSACTION =====
+document.getElementById('addManualTransactionBtn').addEventListener('click', function() {
+  const amount = Number(document.getElementById('vatAmountManual').value || 0);
+  const details = document.getElementById('vatDetailsManual').value || 'Manual Entry';
+  const type = document.getElementById('vatTypeManual').value;
+  
+  if (amount <= 0) {
+    window.TaxTrack.showToast('Please enter a valid amount', 'error');
+    return;
+  }
+  
+  // Calculate VAT if type is VAT
+  const taxAmount = type === 'VAT' ? window.TaxTrack.calculateVAT(amount) : amount;
+  
+  window.TaxTrack.addTransaction({
+    type: type,
+    amount: taxAmount,
+    details: type === 'VAT' ? `${details} (Base: ₦${amount.toLocaleString()})` : details
+  });
+  
+  // Clear form
+  document.getElementById('vatAmountManual').value = '';
+  document.getElementById('vatDetailsManual').value = '';
+  
+  // Show result
+  const resultEl = document.getElementById('vatResult');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<i class="fas fa-check-circle"></i> ${type} of ₦${taxAmount.toLocaleString()} added!`;
+  
+  // Update UI
+  renderTransactions();
+  updateSummary();
+  
+  window.TaxTrack.showToast('Transaction added!', 'success');
+});
+
+// ===== MANUAL TRANSACTION =====
+function addManualTx() {
+  const type = document.getElementById('txType').value;
+  const amount = Number(document.getElementById('txAmount').value || 0);
+  const details = document.getElementById('txDetails').value || 'Manual Entry';
+  
+  if (amount <= 0) {
+    window.TaxTrack.showToast('Please enter a valid amount', 'error');
+    return;
+  }
+  
+  window.TaxTrack.addTransaction({ type, amount, details });
+  
+  // Clear form
+  document.getElementById('txAmount').value = '';
+  document.getElementById('txDetails').value = '';
+  
+  // Update UI
+  renderTransactions();
+  updateSummary();
+  
+  window.TaxTrack.showToast('Transaction added!', 'success');
+}
+
+// ===== RENDER TRANSACTIONS =====
+function renderTransactions() {
+  const transactions = window.TaxTrack.getTransactions();
+  const tbody = document.getElementById('historyBody');
+  
+  if (transactions.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px;">
+          <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 12px; display: block;"></i>
+          No transactions yet. Start by adding a tax calculation.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  tbody.innerHTML = '';
+  transactions.slice().reverse().forEach(tx => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${formatDate(tx.date)}</td>
+      <td><span style="color: var(--accent);">${tx.type}</span></td>
+      <td style="font-family: var(--font-mono);">₦${tx.amount.toLocaleString()}</td>
+      <td>${tx.details}</td>
+      <td>
+        <button class="delete-btn" onclick="deleteTransaction('${tx.id}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function deleteTransaction(id) {
+  if (confirm('Delete this transaction?')) {
+    window.TaxTrack.deleteTransaction(id);
+    renderTransactions();
+    updateSummary();
+    window.TaxTrack.showToast('Transaction deleted', 'info');
+  }
+}
+
+function clearAllTransactions() {
+  if (confirm('Are you sure you want to delete ALL transactions? This cannot be undone.')) {
+    localStorage.removeItem('taxtrack_transactions');
+    window.TaxTrack.transactions = [];
+    renderTransactions();
+    updateSummary();
+    window.TaxTrack.showToast('All transactions cleared', 'info');
+  }
+}
+
+function exportTransactions() {
+  const result = window.TaxTrack.exportTransactionsCSV();
+  if (result) {
+    window.TaxTrack.showToast('CSV exported successfully!', 'success');
+  } else {
+    window.TaxTrack.showToast('No transactions to export', 'error');
+  }
+}
+
+// ===== UPDATE SUMMARY =====
+function updateSummary() {
+  const summary = window.TaxTrack.getTaxSummary();
+  
+  document.getElementById('cardIncome').textContent = `₦${summary.paye.toLocaleString()}`;
+  document.getElementById('cardVAT').textContent = `₦${summary.vat.toLocaleString()}`;
+  document.getElementById('cardConsumption').textContent = `₦${summary.consumption.toLocaleString()}`;
+  document.getElementById('cardTotal').textContent = `₦${summary.total.toLocaleString()}`;
+  
+  if (chart) {
+    chart.data.datasets[0].data = [summary.paye, summary.vat, summary.consumption];
+    chart.update();
+  }
+}
+
+// ===== CHART =====
+function initChart() {
+  const ctx = document.getElementById('taxChart');
+  if (!ctx) return;
+  
+  const summary = window.TaxTrack.getTaxSummary();
+  
+  chart = new Chart(ctx.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Income Tax (PAYE)', 'VAT', 'Consumption Tax'],
+      datasets: [{
+        data: [summary.paye, summary.vat, summary.consumption],
+        backgroundColor: [
+          'rgba(0, 212, 170, 0.8)',
+          'rgba(0, 184, 148, 0.8)',
+          'rgba(0, 206, 201, 0.8)'
+        ],
+        borderColor: [
+          'rgba(0, 212, 170, 1)',
+          'rgba(0, 184, 148, 1)',
+          'rgba(0, 206, 201, 1)'
+        ],
+        borderWidth: 2,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#94a3b8',
+            padding: 20,
+            font: { family: 'Outfit', size: 13 }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ===== PROFILE =====
+function loadProfileData() {
+  const user = window.TaxTrack.getUser();
+  
+  document.getElementById('profileFirstName').value = user.firstName || '';
+  document.getElementById('profileLastName').value = user.lastName || '';
+  document.getElementById('profileEmail').value = user.email || '';
+  document.getElementById('profilePhone').value = user.phone || '';
+  document.getElementById('profileDob').value = user.dob || '';
+  document.getElementById('profileEmployment').value = user.employment || 'Salary Earner';
+  document.getElementById('profileCompany').value = user.company || '';
+  document.getElementById('profileTaxId').value = user.taxId || 'Not assigned';
+}
+
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const updates = {
+    firstName: document.getElementById('profileFirstName').value,
+    lastName: document.getElementById('profileLastName').value,
+    email: document.getElementById('profileEmail').value,
+    phone: document.getElementById('profilePhone').value,
+    dob: document.getElementById('profileDob').value,
+    employment: document.getElementById('profileEmployment').value,
+    company: document.getElementById('profileCompany').value
+  };
+  
+  window.TaxTrack.updateProfile(updates);
+  loadUserInfo();
+  window.TaxTrack.showToast('Profile updated!', 'success');
+});
+
+// ===== SETTINGS =====
+function loadSettingsData() {
+  const settings = window.TaxTrack.getSettings();
+  
+  document.getElementById('settingsCurrency').value = settings.currency || 'NGN';
+  document.getElementById('settingsYearStart').value = settings.financialYearStart || '01';
+  document.getElementById('settingsNotifications').value = String(settings.emailNotifications !== false);
+  document.getElementById('settingsReports').value = String(settings.weeklyReports !== false);
+}
+
+document.getElementById('settingsForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const settings = {
+    currency: document.getElementById('settingsCurrency').value,
+    financialYearStart: document.getElementById('settingsYearStart').value,
+    emailNotifications: document.getElementById('settingsNotifications').value === 'true',
+    weeklyReports: document.getElementById('settingsReports').value === 'true'
+  };
+  
+  window.TaxTrack.saveSettings(settings);
+  window.TaxTrack.showToast('Settings saved!', 'success');
+});
+
+// ===== USER MENU =====
+function setupEventListeners() {
+  const userMenu = document.getElementById('userMenu');
+  userMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+    this.classList.toggle('show');
+  });
+  
+  document.addEventListener('click', function() {
+    userMenu.classList.remove('show');
+  });
+}
+
+function handleLogout() {
+  if (confirm('Are you sure you want to logout?')) {
+    window.TaxTrack.logout();
+  }
+}
+
+function deleteAccount() {
+  if (confirm('Are you sure you want to delete your account? All data will be lost permanently.')) {
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
+}
+
+function showNotifications() {
+  window.TaxTrack.showToast('No new notifications', 'info');
+}
+
+// ===== UTILITIES =====
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+</script>
+
+<!-- OCR Processing Script -->
 <script src="dashboard.js" defer></script>
 </body>
 </html>
