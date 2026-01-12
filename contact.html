@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us | TaxTrack NG</title>
+  <meta name="description" content="Get in touch with the TaxTrack NG support team" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="page-header">
+    <h1>Contact Us</h1>
+    <p>We’re here to help with your tax and compliance needs</p>
+  </header>
+
+  <!-- Main Container -->
+  <main class="legal-page">
+
+    <section class="contact-grid">
+      <!-- Contact Info -->
+      <div class="contact-info">
+        <h2>Get in Touch</h2>
+        <p>Email: <strong>support@taxtrack.ng</strong></p>
+        <p>Business Hours: Mon – Fri, 9am – 5pm (WAT)</p>
+        <p>Location: Nigeria</p>
+      </div>
+
+      <!-- Contact Form -->
+      <form class="contact-form" id="contactForm">
+        <label>
+          Full Name
+          <input type="text" name="name" required placeholder="Your full name" />
+        </label>
+
+        <label>
+          Email Address
+          <input type="email" name="email" required placeholder="Your email address" />
+        </label>
+
+        <label>
+          Message
+          <textarea name="message" rows="5" required placeholder="Your message"></textarea>
+        </label>
+
+        <button type="submit" class="primary-btn">Send Message</button>
+      </form>
+    </section>
+
+    <!-- Back Home Button -->
+    <div class="text-center mt-4">
+      <a href="index.html" class="primary-btn">← Back Home</a>
+    </div>
+
+  </main>
+
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Message sent successfully! We’ll get back to you shortly.');
+      this.reset();
+    });
+  </script>
+
+</body>
+</html>
