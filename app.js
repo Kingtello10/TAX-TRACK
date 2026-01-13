@@ -44,6 +44,7 @@ class TaxTrackApp {
     this.loadUserFromStorage();
     this.loadSettings();
     this.updateUIForAuthState();
+    this.bindAuthForms(); // <-- bind login/signup forms automatically
   }
 
   // ==========================================
@@ -59,7 +60,6 @@ class TaxTrackApp {
       const data = await res.json();
 
       if (res.ok) {
-        // Store user with token for auth headers
         const userWithToken = { ...data.user, token: data.token };
         localStorage.setItem(STORAGE_KEYS.USER_LOGGED_IN, 'true');
         localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userWithToken));
@@ -124,18 +124,13 @@ class TaxTrackApp {
   // ==========================================
   async addTransaction(transaction) {
     if (!this.user || !this.user.token) return { success: false, message: 'Not logged in' };
-
     try {
       const res = await fetch(`${API_BASE}/api/tax`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.user.token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.user.token}` },
         body: JSON.stringify(transaction)
       });
       const data = await res.json();
-
       if (res.ok) {
         this.transactions.push(data);
         return { success: true, transaction: data };
@@ -150,11 +145,8 @@ class TaxTrackApp {
 
   async fetchTransactions() {
     if (!this.user || !this.user.token) return [];
-
     try {
-      const res = await fetch(`${API_BASE}/api/tax`, {
-        headers: { 'Authorization': `Bearer ${this.user.token}` }
-      });
+      const res = await fetch(`${API_BASE}/api/tax`, { headers: { 'Authorization': `Bearer ${this.user.token}` } });
       const data = await res.json();
       if (res.ok) this.transactions = data;
       return this.transactions;
@@ -169,7 +161,6 @@ class TaxTrackApp {
   // ==========================================
   async uploadFile(file, type = 'receipt') {
     if (!this.user || !this.user.token) return { success: false, message: 'Not logged in' };
-
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
@@ -195,11 +186,8 @@ class TaxTrackApp {
 
   async fetchReceipts() {
     if (!this.user || !this.user.token) return [];
-
     try {
-      const res = await fetch(`${API_BASE}/api/receipts`, {
-        headers: { 'Authorization': `Bearer ${this.user.token}` }
-      });
+      const res = await fetch(`${API_BASE}/api/receipts`, { headers: { 'Authorization': `Bearer ${this.user.token}` } });
       const data = await res.json();
       if (res.ok) return data;
       else return [];
@@ -256,10 +244,8 @@ class TaxTrackApp {
   showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-      <span>${message}</span>
-    `;
+    toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+      <span>${message}</span>`;
     if (!document.getElementById('toast-styles')) {
       const styles = document.createElement('style');
       styles.id = 'toast-styles';
@@ -300,6 +286,37 @@ class TaxTrackApp {
     const currency = this.settings.currency || 'NGN';
     const symbol = currency === 'NGN' ? '₦' : '$';
     return `${symbol}${Number(amount).toLocaleString()}`;
+  }
+
+  // ==========================================
+  // Auto-bind login/signup forms
+  // ==========================================
+  bindAuthForms() {
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const result = await this.login(email, password);
+        this.showToast(result.message, result.success ? 'success' : 'error');
+        if (result.success) window.location.href = 'dashboard.html';
+      });
+    }
+
+    if (signupForm) {
+      signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const result = await this.signup({ fullName, email, password });
+        this.showToast(result.message, result.success ? 'success' : 'error');
+        if (result.success) window.location.href = 'dashboard.html';
+      });
+    }
   }
 }
 
