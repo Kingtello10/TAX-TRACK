@@ -59,9 +59,11 @@ class TaxTrackApp {
       const data = await res.json();
 
       if (res.ok) {
+        // Store user with token for auth headers
+        const userWithToken = { ...data.user, token: data.token };
         localStorage.setItem(STORAGE_KEYS.USER_LOGGED_IN, 'true');
-        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(data.user));
-        this.user = data.user;
+        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userWithToken));
+        this.user = userWithToken;
         return { success: true, message: 'Login successful!' };
       } else {
         return { success: false, message: data.message || 'Login failed' };
@@ -82,9 +84,10 @@ class TaxTrackApp {
       const data = await res.json();
 
       if (res.ok) {
+        const userWithToken = { ...data.user, token: data.token };
         localStorage.setItem(STORAGE_KEYS.USER_LOGGED_IN, 'true');
-        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(data.user));
-        this.user = data.user;
+        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userWithToken));
+        this.user = userWithToken;
         return { success: true, message: 'Account created!' };
       } else {
         return { success: false, message: data.message || 'Signup failed' };
@@ -120,7 +123,7 @@ class TaxTrackApp {
   // Transactions via Backend
   // ==========================================
   async addTransaction(transaction) {
-    if (!this.user) return { success: false, message: 'Not logged in' };
+    if (!this.user || !this.user.token) return { success: false, message: 'Not logged in' };
 
     try {
       const res = await fetch(`${API_BASE}/api/tax`, {
@@ -146,7 +149,7 @@ class TaxTrackApp {
   }
 
   async fetchTransactions() {
-    if (!this.user) return [];
+    if (!this.user || !this.user.token) return [];
 
     try {
       const res = await fetch(`${API_BASE}/api/tax`, {
@@ -165,7 +168,7 @@ class TaxTrackApp {
   // Receipts & CSV Upload
   // ==========================================
   async uploadFile(file, type = 'receipt') {
-    if (!this.user) return { success: false, message: 'Not logged in' };
+    if (!this.user || !this.user.token) return { success: false, message: 'Not logged in' };
 
     const formData = new FormData();
     formData.append('file', file);
@@ -174,12 +177,9 @@ class TaxTrackApp {
     try {
       const res = await fetch(`${API_BASE}/api/receipts`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.user.token}`
-        },
+        headers: { 'Authorization': `Bearer ${this.user.token}` },
         body: formData
       });
-
       const data = await res.json();
       if (res.ok) {
         this.transactions.push(...data.transactions);
@@ -194,7 +194,7 @@ class TaxTrackApp {
   }
 
   async fetchReceipts() {
-    if (!this.user) return [];
+    if (!this.user || !this.user.token) return [];
 
     try {
       const res = await fetch(`${API_BASE}/api/receipts`, {
@@ -260,7 +260,6 @@ class TaxTrackApp {
       <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
       <span>${message}</span>
     `;
-
     if (!document.getElementById('toast-styles')) {
       const styles = document.createElement('style');
       styles.id = 'toast-styles';
@@ -274,9 +273,7 @@ class TaxTrackApp {
       `;
       document.head.appendChild(styles);
     }
-
     document.body.appendChild(toast);
-
     setTimeout(() => {
       toast.style.animation = 'slideOut 0.3s ease-out forwards';
       setTimeout(() => toast.remove(), 300);
